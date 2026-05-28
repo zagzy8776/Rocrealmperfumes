@@ -71,8 +71,8 @@ export default function Gallery() {
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-6">
           {images.map((image) => (
             <button key={image.id} onClick={() => setSelected(image)} className="group glass-luxury overflow-hidden rounded-[1.4rem] text-left transition hover:-translate-y-1 hover:shadow-2xl">
-              <div className="aspect-square overflow-hidden bg-amber-50">
-                <img src={image.imageUrl} alt={image.title || 'Roc Realm gallery'} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+              <div className="aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
+                <img src={image.imageUrl} alt={image.title || 'Roc Realm gallery'} loading="lazy" className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
               </div>
               <div className="p-3">
                 <h2 className="line-clamp-2 font-display text-sm font-semibold sm:text-base">{image.title || 'Roc Realm'}</h2>

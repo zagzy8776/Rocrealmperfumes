@@ -119,7 +119,7 @@ export default function AdminProducts() {
           <input placeholder="Notes/tags comma separated e.g. Amber, Vanilla, Gift Ready" value={form.notes} onChange={(e) => update('notes', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
           <div className="grid gap-4 rounded-[1.5rem] bg-amber-50 p-4 lg:col-span-2 md:grid-cols-[220px_1fr]">
             <label className="grid min-h-44 cursor-pointer place-items-center overflow-hidden rounded-[1.2rem] border-2 border-dashed border-amber-300 bg-white/70 text-center transition hover:bg-amber-100">
-              {previewImage ? <img src={previewImage} alt="Product preview" className="h-full w-full object-cover" /> : <div className="p-5"><ImagePlus className="mx-auto text-amber-700" size={38} /><p className="mt-3 text-sm font-semibold">Click to choose product image</p><p className="mt-1 text-xs text-stone-500">Phone gallery/camera</p></div>}
+              {previewImage ? <img src={previewImage} alt="Product preview" className="h-full w-full object-contain p-2" /> : <div className="p-5"><ImagePlus className="mx-auto text-amber-700" size={38} /><p className="mt-3 text-sm font-semibold">Click to choose product image</p><p className="mt-1 text-xs text-stone-500">Phone gallery/camera</p><p className="mt-2 text-[11px] text-stone-400">Full picture shows without cropping.</p></div>}
               <input type="file" accept="image/*" onChange={(e) => uploadProductImage(e.target.files?.[0])} className="hidden" />
             </label>
             <div className="grid content-start gap-3">
@@ -140,7 +140,7 @@ export default function AdminProducts() {
         <aside className="rounded-[2rem] bg-stone-950 p-5 text-white">
           <p className="text-sm text-amber-300">Preview</p>
           <div className="mt-4 aspect-square overflow-hidden rounded-[1.5rem] bg-white/10">
-            {previewImage ? <img src={previewImage} alt="Preview" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-stone-500"><Image size={40} /></div>}
+            {previewImage ? <img src={previewImage} alt="Preview" className="h-full w-full object-contain p-2" /> : <div className="grid h-full place-items-center text-stone-500"><Image size={40} /></div>}
           </div>
           <h3 className="mt-4 font-display text-2xl">{form.name || 'Product name'}</h3>
           <p className="mt-2 text-sm text-stone-400">{form.description || 'Product description preview will appear here.'}</p>
@@ -157,7 +157,7 @@ export default function AdminProducts() {
       <div className="mt-5 grid gap-4">
         {filteredProducts.map((product) => (
           <div key={product.id} className="grid gap-4 rounded-[2rem] bg-white p-4 shadow-sm md:grid-cols-[90px_1fr_130px_190px] md:items-center">
-            <img src={product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80'} alt={product.name} className="h-24 w-24 rounded-2xl object-cover" />
+            <img src={product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80'} alt={product.name} className="h-24 w-24 rounded-2xl bg-amber-50 object-contain p-1" />
             <div>
               <div className="flex flex-wrap items-center gap-2"><strong>{product.name}</strong>{product.isFeatured && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800">Featured</span>}{!product.isActive && <span className="rounded-full bg-red-50 px-2 py-1 text-xs text-red-700">Hidden</span>}</div>
               <p className="mt-1 text-sm text-stone-500">{product.category?.name || 'No category'} · Stock {product.stock} · {product.size || 'No size'}</p>

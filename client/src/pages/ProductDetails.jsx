@@ -21,8 +21,8 @@ export default function ProductDetails() {
 
   return (
     <main className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8">
-      <div className="overflow-hidden rounded-[3rem] bg-white shadow-sm">
-        <img src={product.images?.[0]} alt={product.name} className="h-[36rem] w-full object-cover" />
+      <div className="overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm">
+        <img src={product.images?.[0]} alt={product.name} className="h-[32rem] w-full object-contain" />
       </div>
       <div className="py-6">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-700">{product.category?.name}</p>

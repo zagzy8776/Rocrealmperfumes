@@ -19,7 +19,7 @@ export default function Cart() {
           <div className="grid gap-4">
             {items.map((item) => (
               <div key={item.id} className="flex gap-4 rounded-[2rem] bg-white p-4 shadow-sm">
-                <img src={item.image} alt={item.name} className="h-28 w-24 rounded-2xl object-cover" />
+                <img src={item.image} alt={item.name} className="h-28 w-24 rounded-2xl bg-amber-50 object-contain p-1" />
                 <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
                   <div>
                     <h2 className="font-display text-xl font-semibold">{item.name}</h2>

@@ -9,8 +9,8 @@ export default function ProductCard({ product }) {
 
   return (
     <article className="group overflow-hidden rounded-[1.2rem] border border-amber-900/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl sm:rounded-[1.5rem]">
-      <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-amber-50">
-        <img src={image} alt={product.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+      <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
+        <img src={image} alt={product.name} className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
       </Link>
       <div className="p-3 sm:p-4">
         <p className="truncate text-[10px] uppercase tracking-[0.18em] text-amber-700 sm:text-xs">{product.category?.name || 'Perfume'}</p>

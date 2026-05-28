@@ -83,7 +83,7 @@ export default function AdminGallery() {
 
       <form onSubmit={submit} className="mt-8 grid gap-6 rounded-[2.5rem] bg-white/80 p-6 shadow-sm backdrop-blur-xl lg:grid-cols-[320px_1fr]">
         <label className="grid min-h-80 cursor-pointer place-items-center overflow-hidden rounded-[2rem] border-2 border-dashed border-amber-300 bg-amber-50/80 text-center transition hover:bg-amber-100">
-          {preview ? <img src={preview} alt="Preview" className="h-full w-full object-cover" /> : <div className="p-8"><ImagePlus className="mx-auto text-amber-700" size={48} /><p className="mt-4 font-semibold">Tap to choose picture</p><p className="mt-2 text-sm text-stone-500">Works from phone gallery/camera.</p><p className="mt-3 text-xs text-stone-400">Recommended: bright clear square or portrait image.</p></div>}
+          {preview ? <img src={preview} alt="Preview" className="h-full w-full object-contain p-2" /> : <div className="p-8"><ImagePlus className="mx-auto text-amber-700" size={48} /><p className="mt-4 font-semibold">Tap to choose picture</p><p className="mt-2 text-sm text-stone-500">Works from phone gallery/camera.</p><p className="mt-3 text-xs text-stone-400">The full image will show without cropping.</p></div>}
           <input type="file" accept="image/*" onChange={(e) => chooseFile(e.target.files?.[0])} className="hidden" />
         </label>
         <div className="grid content-start gap-4">
@@ -114,7 +114,7 @@ export default function AdminGallery() {
         {images.map((image) => (
           <article key={image.id} className="glass-luxury overflow-hidden rounded-[1.5rem]">
             <div className="relative aspect-square">
-              <img src={image.imageUrl} alt={image.title || 'Gallery'} className="h-full w-full object-cover" />
+              <img src={image.imageUrl} alt={image.title || 'Gallery'} className="h-full w-full bg-amber-50 object-contain p-1" />
               <div className="absolute left-2 top-2 flex gap-1">{image.isFeatured && <span className="rounded-full bg-amber-500 p-1 text-white"><Star size={13} /></span>}{!image.isActive && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] text-white">Hidden</span>}</div>
             </div>
             <div className="p-3">
