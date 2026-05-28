@@ -10,6 +10,7 @@ const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const couponRoutes = require('./routes/coupons');
+const prisma = require('./lib/prisma');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -49,6 +50,37 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.get('/api/db/status', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    const [productCount, adminCount, categoryCount] = await Promise.all([
+      prisma.product.count(),
+      prisma.admin.count(),
+      prisma.category.count(),
+    ]);
+
+    res.json({
+      status: 'connected',
+      productCount,
+      adminCount,
+      categoryCount,
+      hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+      hasDirectUrl: Boolean(process.env.DATABASE_URL_UNPOOLED),
+    });
+  } catch (error) {
+    console.error('Database status error:', error);
+    res.status(500).json({
+      status: 'database_error',
+      code: error.code || error.name,
+      message: error.code === 'P2021'
+        ? 'Database tables are missing. Run: npx prisma db push, then npm run db:seed.'
+        : error.message,
+      hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+      hasDirectUrl: Boolean(process.env.DATABASE_URL_UNPOOLED),
+    });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -80,6 +112,27 @@ app.use((error, req, res, next) => {
 
   if (error.code === 'P2025') {
     return res.status(404).json({ message: 'Record not found.' });
+  }
+
+  if (error.code === 'P2021') {
+    return res.status(500).json({
+      message: 'Database tables are missing. Run Prisma db push and seed on Render.',
+      code: error.code,
+    });
+  }
+
+  if (error.code === 'P1001') {
+    return res.status(500).json({
+      message: 'Database server cannot be reached. Check Neon DATABASE_URL on Render.',
+      code: error.code,
+    });
+  }
+
+  if (error.name === 'PrismaClientInitializationError') {
+    return res.status(500).json({
+      message: 'Prisma could not initialize. Check DATABASE_URL and DATABASE_URL_UNPOOLED on Render.',
+      code: error.errorCode || error.name,
+    });
   }
 
   res.status(500).json({ message: 'Something went wrong.' });
