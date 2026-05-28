@@ -4,10 +4,12 @@ services:
     env: node
     plan: free
     rootDir: server
-    buildCommand: npm install --include=dev && npx prisma generate
+    buildCommand: npm install --include=dev && npm run deploy:setup
     startCommand: npm start
     envVars:
       - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_UNPOOLED
         sync: false
       - key: JWT_SECRET
         sync: false

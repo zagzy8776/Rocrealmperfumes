@@ -83,7 +83,7 @@ Deploy the `server` folder.
 Recommended settings:
 
 - Root Directory: `server`
-- Build Command: `npm install --include=dev && npx prisma generate`
+- Build Command: `npm install --include=dev && npm run deploy:setup`
 - Start Command: `npm start`
 
 Environment variables:
@@ -97,7 +97,7 @@ Environment variables:
 - `ADMIN_EMAIL=rocrealmnigerialimited@gmail.com`
 - `ADMIN_PASSWORD=choose-a-strong-password`
 
-After deploy, run:
+The recommended build command runs Prisma setup automatically. If you need to run it manually, use:
 
 ```bash
 npx prisma db push
