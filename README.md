@@ -89,6 +89,7 @@ Recommended settings:
 Environment variables:
 
 - `DATABASE_URL`
+- `DATABASE_URL_UNPOOLED` for Neon direct connection used by Prisma schema pushes
 - `JWT_SECRET`
 - `CLIENT_URL` e.g. `https://your-vercel-domain.vercel.app`
 - `NODE_ENV=production`
