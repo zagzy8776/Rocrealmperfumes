@@ -12,11 +12,13 @@ import Checkout from './pages/Checkout.jsx';
 import OrderSuccess from './pages/OrderSuccess.jsx';
 import About from './pages/About.jsx';
 import Contact from './pages/Contact.jsx';
+import Gallery from './pages/Gallery.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import AdminProducts from './pages/admin/AdminProducts.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminCategoriesCoupons from './pages/admin/AdminCategoriesCoupons.jsx';
+import AdminGallery from './pages/admin/AdminGallery.jsx';
 import './styles.css';
 
 const Protected = ({ children }) => {
@@ -37,6 +39,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/about" element={<About />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
 
@@ -45,6 +48,7 @@ createRoot(document.getElementById('root')).render(
             <Route index element={<Dashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="gallery" element={<AdminGallery />} />
             <Route path="settings" element={<AdminCategoriesCoupons />} />
           </Route>
         </Routes>

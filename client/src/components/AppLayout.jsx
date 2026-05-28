@@ -7,6 +7,7 @@ import { businessInfo, whatsappNumber } from '../lib/api.js';
 const nav = [
   ['Home', '/'],
   ['Shop', '/shop'],
+  ['Gallery', '/gallery'],
   ['About', '/about'],
   ['Contact', '/contact'],
 ];
@@ -57,6 +58,7 @@ export default function AppLayout() {
             <h4 className="font-semibold text-amber-300">Quick Links</h4>
             <div className="mt-4 grid gap-2 text-sm text-stone-400">
               <Link to="/shop">Shop Collection</Link>
+              <Link to="/gallery">Gallery</Link>
               <Link to="/cart">Cart</Link>
               <Link to="/contact">Contact</Link>
             </div>

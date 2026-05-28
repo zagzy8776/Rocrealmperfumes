@@ -10,6 +10,7 @@ const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const couponRoutes = require('./routes/coupons');
+const galleryRoutes = require('./routes/gallery');
 const prisma = require('./lib/prisma');
 
 const app = express();
@@ -86,6 +87,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Backward-compatible route aliases for frontend deployments that were
 // configured with the Render root URL instead of the `/api` base path.
@@ -94,6 +96,7 @@ app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/orders', orderRoutes);
 app.use('/coupons', couponRoutes);
+app.use('/gallery', galleryRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found.' });

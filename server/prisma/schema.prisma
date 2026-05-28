@@ -111,3 +111,15 @@ model Coupon {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 }
+
+model GalleryImage {
+  id          String   @id @default(cuid())
+  title       String?
+  caption     String?
+  imageUrl    String
+  publicId    String?
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
