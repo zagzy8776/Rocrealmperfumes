@@ -121,6 +121,8 @@ Environment variables:
 - `VITE_API_URL=https://your-render-api.onrender.com/api`
 - `VITE_WHATSAPP_NUMBER=2349084782126`
 
+If you accidentally set `VITE_API_URL` to the Render root URL without `/api`, the frontend normalizes it automatically, but using `/api` in Vercel is still recommended.
+
 ## Important
 
 Do not commit real `.env` files. Only `.env.example` should be on GitHub.

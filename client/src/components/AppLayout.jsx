@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Menu, ShoppingBag, Sparkles } from 'lucide-react';
+import { CreditCard, Mail, MapPin, Menu, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { businessInfo, whatsappNumber } from '../lib/api.js';
@@ -58,17 +58,19 @@ export default function AppLayout() {
             <div className="mt-4 grid gap-2 text-sm text-stone-400">
               <Link to="/shop">Shop Collection</Link>
               <Link to="/cart">Cart</Link>
-              <Link to="/admin/login">Admin</Link>
+              <Link to="/contact">Contact</Link>
             </div>
           </div>
           <div>
             <h4 className="font-semibold text-amber-300">Order Support</h4>
-            <p className="mt-4 text-sm text-stone-400">WhatsApp ordering, bank transfer, pay on delivery, and direct product consultation.</p>
-            <div className="mt-4 grid gap-2 text-sm text-stone-400">
-              <a href={`https://wa.me/${whatsappNumber}`}>{businessInfo.phoneDisplay}</a>
-              <a href={`mailto:${businessInfo.email}`}>{businessInfo.email}</a>
-              <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer">Instagram: {businessInfo.instagram}</a>
-              <a href={businessInfo.tiktokUrl} target="_blank" rel="noreferrer">TikTok: {businessInfo.tiktok}</a>
+            <p className="mt-4 text-sm text-stone-400">Premium support for ordering, payment confirmation, delivery, and product consultation.</p>
+            <div className="mt-5 grid gap-3 text-sm text-stone-300">
+              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition hover:text-amber-200"><MessageCircle size={17} className="text-green-400" /> WhatsApp: {businessInfo.phoneDisplay}</a>
+              <a href={`mailto:${businessInfo.email}`} className="flex items-center gap-3 transition hover:text-amber-200"><Mail size={17} className="text-amber-300" /> Email support</a>
+              <span className="flex items-center gap-3"><CreditCard size={17} className="text-amber-300" /> Bank transfer / pay on delivery</span>
+              <span className="flex items-center gap-3"><PackageCheck size={17} className="text-amber-300" /> Order confirmation and tracking</span>
+              <span className="flex items-center gap-3"><Truck size={17} className="text-amber-300" /> Delivery coordination in Owerri</span>
+              <a href={businessInfo.mapUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition hover:text-amber-200"><MapPin size={17} className="text-red-400" /> Get directions on Google Maps</a>
             </div>
           </div>
         </div>

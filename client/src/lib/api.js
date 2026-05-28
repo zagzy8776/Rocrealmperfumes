@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const normalizeApiUrl = (url) => {
+  const cleanUrl = String(url).replace(/\/+$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
+
+export const API_URL = normalizeApiUrl(rawApiUrl);
 
 export const api = axios.create({ baseURL: API_URL });
 
@@ -27,4 +34,6 @@ export const businessInfo = {
   tiktok: '@rocrealm_perfumes',
   instagramUrl: 'https://instagram.com/rocrealm_perfumes',
   tiktokUrl: 'https://www.tiktok.com/@rocrealm_perfumes',
+  location: 'Owerri, Imo State, Nigeria',
+  mapUrl: 'https://www.google.com/maps/dir/?api=1&destination=Roc%20Realm%20Perfumes%20Owerri%20Imo%20State%20Nigeria',
 };
