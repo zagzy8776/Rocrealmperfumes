@@ -17,7 +17,11 @@ const configureCloudinary = () => {
 };
 
 const uploadBufferToCloudinary = (file, folder) => new Promise((resolve, reject) => {
-  if (!configureCloudinary()) return reject(new Error('Cloudinary is not configured on the server.'));
+  if (!configureCloudinary()) {
+    const error = new Error('Cloudinary is not configured on the server. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on Render, then redeploy.');
+    error.code = 'CLOUDINARY_NOT_CONFIGURED';
+    return reject(error);
+  }
 
   const stream = cloudinary.uploader.upload_stream(
     { folder, resource_type: 'image' },

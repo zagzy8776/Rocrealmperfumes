@@ -85,7 +85,7 @@ export default function AdminProducts() {
       update('images', [res.data.imageUrl, ...currentImages].join('\n'));
       setMessage('Product image uploaded. Fill the product details and save.');
     } catch (err) {
-      setError(err.response?.data?.message || 'Image upload failed. Check Cloudinary setup on Render.');
+      setError(err.response?.data?.message || 'Image upload failed. Confirm Cloudinary variables are added on Render and redeploy backend.');
     } finally {
       setImageUploading(false);
     }

@@ -138,6 +138,20 @@ app.use((error, req, res, next) => {
     });
   }
 
+  if (error.code === 'CLOUDINARY_NOT_CONFIGURED') {
+    return res.status(500).json({ message: error.message, code: error.code });
+  }
+
+  if (error.http_code || error.name === 'Error') {
+    const isUploadRoute = req.path.includes('upload-image') || req.path.includes('gallery');
+    if (isUploadRoute) {
+      return res.status(500).json({
+        message: error.message || 'Image upload failed. Check Cloudinary credentials on Render.',
+        code: error.code || error.http_code || error.name,
+      });
+    }
+  }
+
   res.status(500).json({ message: 'Something went wrong.' });
 });
 

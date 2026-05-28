@@ -38,7 +38,7 @@ export default function AdminGallery() {
       setMessage('Gallery image uploaded successfully.');
       load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Upload failed. Check Cloudinary setup on Render.');
+      setError(err.response?.data?.message || 'Upload failed. Confirm Cloudinary variables are added on Render and redeploy backend.');
     } finally {
       setLoading(false);
     }

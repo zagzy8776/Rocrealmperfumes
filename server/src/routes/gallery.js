@@ -63,6 +63,13 @@ router.get('/admin/all', requireAdmin, asyncHandler(async (req, res) => {
   res.json({ images: images.map(serializeImage) });
 }));
 
+router.get('/upload-status', requireAdmin, (req, res) => {
+  res.json({
+    cloudinaryConfigured: hasCloudinary(),
+    requiredEnv: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'],
+  });
+});
+
 router.post('/', requireAdmin, upload.single('image'), asyncHandler(async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Please choose an image to upload.' });
   const result = await uploadBufferToCloudinary(req.file, 'roc-realm-gallery');
