@@ -44,8 +44,39 @@ const uploadToCloudinary = (file) => new Promise((resolve, reject) => {
 
 router.get('/', asyncHandler(async (req, res) => {
   const includeInactive = req.query.active === 'false';
+  const page = Math.max(1, Number(req.query.page || 1));
+  const limit = Math.min(48, Math.max(6, Number(req.query.limit || 24)));
+  const search = req.query.search ? String(req.query.search) : '';
+  const featured = req.query.featured === 'true';
+  const where = {
+    isActive: includeInactive ? undefined : true,
+    isFeatured: featured ? true : undefined,
+    OR: search ? [
+      { title: { contains: search, mode: 'insensitive' } },
+      { caption: { contains: search, mode: 'insensitive' } },
+    ] : undefined,
+  };
+
+  const [images, total] = await Promise.all([
+    prisma.galleryImage.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+    }),
+    prisma.galleryImage.count({ where }),
+  ]);
+
+  res.json({
+    images: images.map(serializeImage),
+    pagination: { page, limit, total, hasMore: page * limit < total },
+  });
+}));
+
+router.get('/featured', asyncHandler(async (req, res) => {
   const images = await prisma.galleryImage.findMany({
-    where: { isActive: includeInactive ? undefined : true },
+    where: { isActive: true, isFeatured: true },
+    take: 12,
     orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
   });
   res.json({ images: images.map(serializeImage) });

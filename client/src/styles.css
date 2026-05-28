@@ -29,9 +29,29 @@ body {
   border: 1px solid rgba(181, 133, 38, 0.24);
 }
 
+.glass-dark {
+  background: rgba(18, 12, 8, 0.72);
+  backdrop-filter: blur(22px);
+  border: 1px solid rgba(245, 197, 92, 0.18);
+}
+
+.glass-luxury {
+  background: linear-gradient(135deg, rgba(255, 250, 241, 0.78), rgba(255, 255, 255, 0.55));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(181, 133, 38, 0.2);
+  box-shadow: 0 24px 70px rgba(72, 47, 22, 0.12);
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
