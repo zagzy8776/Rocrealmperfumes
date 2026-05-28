@@ -1,6 +1,6 @@
-# Roc Realm Perfume
+# Roc Realm Perfumes
 
-A luxury full-stack online perfume store for Roc Realm Perfume.
+A luxury full-stack online store for Roc Realm Nigeria Limited: designer perfumes, oil perfumes, colognes, sprays, diffusers, humidifiers, nightwear, and lingeries.
 
 ## Stack
 
@@ -32,7 +32,7 @@ A luxury full-stack online perfume store for Roc Realm Perfume.
 ```bash
 cd server
 copy .env.example .env
-npm install
+npm install --include=dev
 npx prisma generate
 npx prisma db push
 npm run db:seed
@@ -46,20 +46,31 @@ Set `DATABASE_URL` in `server/.env` using your Neon PostgreSQL connection string
 ```bash
 cd client
 copy .env.example .env
-npm install
+npm install --include=dev
 npm run dev
 ```
 
-Update `VITE_WHATSAPP_NUMBER` with Roc Realm Perfume's WhatsApp number in international format, for example `2348012345678`.
+Update `VITE_WHATSAPP_NUMBER` with Roc Realm Perfume's WhatsApp number in international format. Current number: `2349084782126`.
 
 ## Default Seed Admin
 
-- Email: `admin@rocrealmperfume.com`
+- Email: `admin@rocrealmperfume.com` by default, or set `ADMIN_EMAIL=rocrealmnigerialimited@gmail.com`
 - Password: `ChangeMe123!`
 
 Change these in `server/.env` before deployment.
 
 ## Deployment
+
+## Production Checklist
+
+- Create Neon PostgreSQL database.
+- Add Render backend environment variables.
+- Deploy backend on Render.
+- Run `npx prisma db push` and `npm run db:seed` on Render.
+- Add Vercel frontend environment variables.
+- Deploy frontend on Vercel.
+- Update Render `CLIENT_URL` to your final Vercel domain.
+- Test shop, product details, cart, checkout, WhatsApp redirect, and admin login.
 
 ### Neon
 
@@ -69,12 +80,21 @@ Create a Neon PostgreSQL database and copy the connection string into Render as 
 
 Deploy the `server` folder.
 
+Recommended settings:
+
+- Root Directory: `server`
+- Build Command: `npm install --include=dev && npx prisma generate`
+- Start Command: `npm start`
+
 Environment variables:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
-- `CLIENT_URL`
+- `CLIENT_URL` e.g. `https://your-vercel-domain.vercel.app`
 - `NODE_ENV=production`
+- `ADMIN_NAME=Roc Realm Admin`
+- `ADMIN_EMAIL=rocrealmnigerialimited@gmail.com`
+- `ADMIN_PASSWORD=choose-a-strong-password`
 
 After deploy, run:
 
@@ -87,7 +107,17 @@ npm run db:seed
 
 Deploy the `client` folder.
 
+Recommended settings:
+
+- Root Directory: `client`
+- Build Command: `npm install --include=dev && npm run build`
+- Output Directory: `dist`
+
 Environment variables:
 
 - `VITE_API_URL=https://your-render-api.onrender.com/api`
-- `VITE_WHATSAPP_NUMBER=234xxxxxxxxxx`
+- `VITE_WHATSAPP_NUMBER=2349084782126`
+
+## Important
+
+Do not commit real `.env` files. Only `.env.example` should be on GitHub.

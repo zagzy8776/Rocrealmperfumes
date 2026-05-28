@@ -2,6 +2,9 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
@@ -10,10 +13,31 @@ const couponRoutes = require('./routes/coupons');
 
 const app = express();
 const port = process.env.PORT || 5000;
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((origin) => origin.trim()).filter(Boolean)
+  : ['http://localhost:5173'];
 
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+app.use(compression());
 app.use(cors({
-  origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : ['http://localhost:5173'],
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
+}));
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
 }));
 app.use(express.json({ limit: '1mb' }));
 
