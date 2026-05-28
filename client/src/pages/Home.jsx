@@ -57,7 +57,7 @@ export default function Home() {
           </div>
           <Link to="/shop" className="font-semibold text-amber-800">View all products</Link>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
       </section>

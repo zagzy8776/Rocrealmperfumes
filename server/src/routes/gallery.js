@@ -1,10 +1,10 @@
 const express = require('express');
 const multer = require('multer');
-const { v2: cloudinary } = require('cloudinary');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const asyncHandler = require('../utils/asyncHandler');
 const { requireAdmin } = require('../middleware/auth');
+const { cloudinary, hasCloudinary, uploadBufferToCloudinary } = require('../utils/cloudinaryUpload');
 
 const router = express.Router();
 const upload = multer({
@@ -16,31 +16,7 @@ const upload = multer({
   },
 });
 
-const hasCloudinary = Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
-
-if (hasCloudinary) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-  });
-}
-
 const serializeImage = (image) => image;
-
-const uploadToCloudinary = (file) => new Promise((resolve, reject) => {
-  if (!hasCloudinary) return reject(new Error('Cloudinary is not configured on the server.'));
-
-  const stream = cloudinary.uploader.upload_stream(
-    { folder: 'roc-realm-gallery', resource_type: 'image' },
-    (error, result) => {
-      if (error) return reject(error);
-      resolve(result);
-    }
-  );
-
-  stream.end(file.buffer);
-});
 
 router.get('/', asyncHandler(async (req, res) => {
   const includeInactive = req.query.active === 'false';
@@ -89,7 +65,7 @@ router.get('/admin/all', requireAdmin, asyncHandler(async (req, res) => {
 
 router.post('/', requireAdmin, upload.single('image'), asyncHandler(async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Please choose an image to upload.' });
-  const result = await uploadToCloudinary(req.file);
+  const result = await uploadBufferToCloudinary(req.file, 'roc-realm-gallery');
 
   const image = await prisma.galleryImage.create({
     data: {
@@ -134,7 +110,7 @@ router.delete('/:id', requireAdmin, asyncHandler(async (req, res) => {
   const image = await prisma.galleryImage.findUnique({ where: { id: req.params.id } });
   if (!image) return res.status(404).json({ message: 'Gallery image not found.' });
 
-  if (image.publicId && hasCloudinary) {
+  if (image.publicId && hasCloudinary()) {
     await cloudinary.uploader.destroy(image.publicId).catch(() => null);
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Edit3, Image, Plus, Search, Trash2, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Edit3, Image, ImagePlus, Plus, Search, Trash2, UploadCloud, X } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
 const empty = { name: '', description: '', price: '', salePrice: '', size: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
@@ -13,6 +13,7 @@ export default function AdminProducts() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
 
   const load = async () => {
     const [productRes, categoryRes] = await Promise.all([api.get('/products/admin/all'), api.get('/categories')]);
@@ -71,6 +72,25 @@ export default function AdminProducts() {
     }
   };
 
+  const uploadProductImage = async (selectedFile) => {
+    if (!selectedFile) return;
+    setError('');
+    setMessage('');
+    setImageUploading(true);
+    try {
+      const body = new FormData();
+      body.append('image', selectedFile);
+      const res = await api.post('/products/upload-image', body, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const currentImages = form.images.split('\n').map((item) => item.trim()).filter(Boolean);
+      update('images', [res.data.imageUrl, ...currentImages].join('\n'));
+      setMessage('Product image uploaded. Fill the product details and save.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Image upload failed. Check Cloudinary setup on Render.');
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
   const previewImage = form.images.split('\n').map((item) => item.trim()).filter(Boolean)[0];
 
   return (
@@ -97,7 +117,20 @@ export default function AdminProducts() {
           <input type="number" placeholder="Stock" value={form.stock} onChange={(e) => update('stock', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <textarea required placeholder="Description" value={form.description} onChange={(e) => update('description', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
           <input placeholder="Notes/tags comma separated e.g. Amber, Vanilla, Gift Ready" value={form.notes} onChange={(e) => update('notes', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
-          <textarea placeholder="Image URLs, one per line" value={form.images} onChange={(e) => update('images', e.target.value)} className="min-h-24 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
+          <div className="grid gap-4 rounded-[1.5rem] bg-amber-50 p-4 lg:col-span-2 md:grid-cols-[220px_1fr]">
+            <label className="grid min-h-44 cursor-pointer place-items-center overflow-hidden rounded-[1.2rem] border-2 border-dashed border-amber-300 bg-white/70 text-center transition hover:bg-amber-100">
+              {previewImage ? <img src={previewImage} alt="Product preview" className="h-full w-full object-cover" /> : <div className="p-5"><ImagePlus className="mx-auto text-amber-700" size={38} /><p className="mt-3 text-sm font-semibold">Click to choose product image</p><p className="mt-1 text-xs text-stone-500">Phone gallery/camera</p></div>}
+              <input type="file" accept="image/*" onChange={(e) => uploadProductImage(e.target.files?.[0])} className="hidden" />
+            </label>
+            <div className="grid content-start gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-stone-800"><UploadCloud size={16} className="text-amber-700" /> Product Pictures</div>
+                <p className="mt-1 text-xs leading-5 text-stone-600">Admin should click the image box to pick from phone gallery. The image will upload to Cloudinary and the URL will appear below automatically. You can also paste extra image URLs if needed.</p>
+              </div>
+              <textarea placeholder="Uploaded image URLs will appear here automatically. One URL per line." value={form.images} onChange={(e) => update('images', e.target.value)} className="min-h-24 rounded-2xl bg-white px-4 py-3 text-sm outline-none" />
+              {imageUploading && <p className="text-sm font-semibold text-amber-700">Uploading image...</p>}
+            </div>
+          </div>
           <div className="flex flex-wrap gap-5 lg:col-span-2">
             <label className="flex items-center gap-2"><input type="checkbox" checked={form.isFeatured} onChange={(e) => update('isFeatured', e.target.checked)} /> Featured product</label>
             <label className="flex items-center gap-2"><input type="checkbox" checked={form.isActive} onChange={(e) => update('isActive', e.target.checked)} /> Visible in shop</label>

@@ -1,12 +1,22 @@
 const express = require('express');
+const multer = require('multer');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const asyncHandler = require('../utils/asyncHandler');
 const { requireAdmin } = require('../middleware/auth');
 const makeSlug = require('../utils/slug');
 const { formatProduct } = require('../utils/money');
+const { uploadBufferToCloudinary } = require('../utils/cloudinaryUpload');
 
 const router = express.Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 6 * 1024 * 1024 },
+  fileFilter(req, file, callback) {
+    if (!file.mimetype.startsWith('image/')) return callback(new Error('Only image files are allowed.'));
+    callback(null, true);
+  },
+});
 
 const productSchema = z.object({
   name: z.string().min(2),
@@ -45,6 +55,12 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/admin/all', requireAdmin, asyncHandler(async (req, res) => {
   const products = await prisma.product.findMany({ include: { category: true }, orderBy: { createdAt: 'desc' } });
   res.json({ products: products.map(formatProduct) });
+}));
+
+router.post('/upload-image', requireAdmin, upload.single('image'), asyncHandler(async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Please choose a product image.' });
+  const result = await uploadBufferToCloudinary(req.file, 'roc-realm-products');
+  res.status(201).json({ imageUrl: result.secure_url, publicId: result.public_id });
 }));
 
 router.get('/:slug', asyncHandler(async (req, res) => {
