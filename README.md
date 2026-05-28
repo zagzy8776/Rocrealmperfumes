@@ -108,6 +108,8 @@ npm run db:seed
 
 Deploy the `client` folder.
 
+If Vercel imports the repository root, the root `vercel.json` will build `client` and output `client/dist` automatically. If you configure manually, use the settings below.
+
 Recommended settings:
 
 - Root Directory: `client`
