@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ReceiptText, Settings, LogOut } from 'lucide-react';
+import { ExternalLink, LayoutDashboard, LogOut, Package, ReceiptText, Settings, Sparkles } from 'lucide-react';
 
 const links = [
   ['Dashboard', '/admin', LayoutDashboard],
@@ -16,22 +16,29 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 bg-stone-950 p-6 text-white lg:block">
-        <h1 className="font-display text-3xl">Roc Realm</h1>
-        <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Admin</p>
+    <div className="min-h-screen bg-[#f6efe3]">
+      <aside className="fixed inset-y-0 left-0 hidden w-72 overflow-hidden bg-stone-950 p-6 text-white lg:block">
+        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-amber-500/20 blur-3xl" />
+        <div className="relative">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-stone-950"><Sparkles size={22} /></div>
+          <h1 className="mt-4 font-display text-3xl">Roc Realm</h1>
+          <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Luxury Admin</p>
+        </div>
         <nav className="mt-10 grid gap-2">
           {links.map(([label, path, Icon]) => (
-            <NavLink key={path} to={path} end={path === '/admin'} className={({ isActive }) => `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm ${isActive ? 'bg-amber-600 text-white' : 'text-stone-300 hover:bg-white/10'}`}>
+            <NavLink key={path} to={path} end={path === '/admin'} className={({ isActive }) => `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition ${isActive ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20' : 'text-stone-300 hover:bg-white/10 hover:text-white'}`}>
               <Icon size={18} /> {label}
             </NavLink>
           ))}
         </nav>
-        <button onClick={logout} className="absolute bottom-6 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-stone-300 hover:bg-white/10"><LogOut size={18} /> Logout</button>
+        <div className="absolute bottom-6 left-6 right-6 grid gap-2">
+          <a href="/" target="_blank" className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-stone-300 hover:bg-white/10"><ExternalLink size={18} /> View Store</a>
+          <button onClick={logout} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm text-red-200 hover:bg-red-500/10"><LogOut size={18} /> Logout</button>
+        </div>
       </aside>
       <main className="lg:pl-72">
-        <div className="sticky top-0 z-30 flex gap-2 overflow-auto border-b bg-white p-3 lg:hidden">
-          {links.map(([label, path]) => <NavLink key={path} to={path} end={path === '/admin'} className="whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm">{label}</NavLink>)}
+        <div className="sticky top-0 z-30 flex gap-2 overflow-auto border-b border-amber-900/10 bg-white/90 p-3 backdrop-blur lg:hidden">
+          {links.map(([label, path]) => <NavLink key={path} to={path} end={path === '/admin'} className={({ isActive }) => `whitespace-nowrap rounded-full px-4 py-2 text-sm ${isActive ? 'bg-stone-950 text-white' : 'bg-stone-100 text-stone-700'}`}>{label}</NavLink>)}
           <button onClick={logout} className="rounded-full bg-red-50 px-4 py-2 text-sm text-red-700">Logout</button>
         </div>
         <Outlet />
