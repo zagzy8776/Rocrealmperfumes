@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, formatNaira, whatsappNumber } from '../lib/api.js';
+import { api, bankDetails, deliveryOptions, formatNaira, whatsappNumber } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
+import { getCampaign } from '../lib/analytics.js';
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
@@ -11,10 +12,13 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [couponMessage, setCouponMessage] = useState('');
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ customerName: '', customerPhone: '', customerEmail: '', deliveryAddress: '', deliveryCity: 'Owerri', deliveryNote: '', paymentMethod: 'BANK_TRANSFER' });
+  const [form, setForm] = useState({ customerName: '', customerPhone: '', customerEmail: '', deliveryAddress: '', deliveryCity: 'Owerri', deliveryNote: '', deliveryMethod: 'PICKUP', paymentMethod: 'BANK_TRANSFER' });
 
-  const total = Math.max(0, subtotal - discount);
+  const selectedDelivery = deliveryOptions.find((option) => option.value === form.deliveryMethod) || deliveryOptions[0];
+  const deliveryFee = selectedDelivery.fee;
+  const total = Math.max(0, subtotal - discount + deliveryFee);
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const copy = (value) => navigator.clipboard?.writeText(String(value)).catch(() => null);
 
   const validateCoupon = async () => {
     if (!couponCode) return;
@@ -38,11 +42,12 @@ export default function Checkout() {
       const res = await api.post('/orders', {
         ...form,
         couponCode: couponCode || null,
+        ...getCampaign(),
         items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
       });
       const order = res.data.order;
       const lines = order.items.map((item, index) => `${index + 1}. ${item.productName} - ${formatNaira(item.productPrice)} x ${item.quantity}`).join('\n');
-      const message = encodeURIComponent(`Hello Roc Realm Perfume, I just placed an order.\n\nOrder No: ${order.orderNumber}\nName: ${order.customerName}\nPhone: ${order.customerPhone}\nAddress: ${order.deliveryAddress}, ${order.deliveryCity || ''}\n\nItems:\n${lines}\n\nSubtotal: ${formatNaira(order.subtotal)}\nDiscount: ${formatNaira(order.discount)}\nTotal: ${formatNaira(order.total)}\nPayment: ${order.paymentMethod}\n\nPlease confirm availability.`);
+      const message = encodeURIComponent(`Hello Roc Realm Perfume, I just placed an order.\n\nOrder No: ${order.orderNumber}\nName: ${order.customerName}\nPhone: ${order.customerPhone}\nAddress: ${order.deliveryAddress}, ${order.deliveryCity || ''}\nDelivery: ${selectedDelivery.label} (${formatNaira(order.deliveryFee || 0)})\n\nItems:\n${lines}\n\nSubtotal: ${formatNaira(order.subtotal)}\nDiscount: ${formatNaira(order.discount)}\nDelivery Fee: ${formatNaira(order.deliveryFee || 0)}\nTotal: ${formatNaira(order.total)}\nPayment: ${order.paymentMethod}\n\nPlease confirm availability.`);
       clearCart();
       window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
       navigate('/order-success', { state: { order } });
@@ -66,6 +71,18 @@ export default function Checkout() {
             <input placeholder="City/State" value={form.deliveryCity} onChange={(e) => update('deliveryCity', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
             <textarea required placeholder="Delivery address" value={form.deliveryAddress} onChange={(e) => update('deliveryAddress', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none md:col-span-2" />
             <textarea placeholder="Delivery note optional" value={form.deliveryNote} onChange={(e) => update('deliveryNote', e.target.value)} className="min-h-24 rounded-2xl bg-stone-100 px-4 py-3 outline-none md:col-span-2" />
+            <div className="grid gap-3 rounded-2xl bg-amber-50 p-4 md:col-span-2">
+              <h2 className="font-display text-2xl font-semibold">Delivery Method</h2>
+              {deliveryOptions.map((option) => (
+                <label key={option.value} className={`cursor-pointer rounded-2xl border p-4 ${form.deliveryMethod === option.value ? 'border-amber-600 bg-white' : 'border-transparent bg-white/60'}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2"><input type="radio" checked={form.deliveryMethod === option.value} onChange={() => update('deliveryMethod', option.value)} /> {option.label}</span>
+                    <strong>{formatNaira(option.fee)}</strong>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-stone-600">{option.note}</p>
+                </label>
+              ))}
+            </div>
             <select value={form.paymentMethod} onChange={(e) => update('paymentMethod', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none md:col-span-2">
               <option value="BANK_TRANSFER">Bank Transfer</option>
               <option value="PAY_ON_DELIVERY">Pay on Delivery</option>
@@ -83,9 +100,20 @@ export default function Checkout() {
             <button type="button" onClick={validateCoupon} className="rounded-full bg-white/10 px-4 py-3">Apply</button>
           </div>
           {couponMessage && <p className={`mt-2 text-sm ${discount ? 'text-green-300' : 'text-red-300'}`}>{couponMessage}</p>}
+          {form.paymentMethod === 'BANK_TRANSFER' && <div className="mt-6 rounded-2xl bg-white/10 p-4 text-sm">
+            <h3 className="font-display text-xl text-amber-200">Bank Transfer Details</h3>
+            <div className="mt-3 grid gap-2 text-stone-200">
+              <div className="flex justify-between gap-3"><span>Bank</span><strong>{bankDetails.bankName}</strong></div>
+              <div className="flex items-center justify-between gap-3"><span>Account No.</span><button type="button" onClick={() => copy(bankDetails.accountNumber)} className="font-bold text-amber-200 underline">{bankDetails.accountNumber}</button></div>
+              <div className="flex justify-between gap-3"><span>Name</span><strong className="text-right">{bankDetails.accountName}</strong></div>
+              <div className="flex items-center justify-between gap-3"><span>Amount</span><button type="button" onClick={() => copy(total)} className="font-bold text-amber-200 underline">{formatNaira(total)}</button></div>
+            </div>
+            <p className="mt-3 text-xs leading-5 text-stone-300">After transfer, place the order and use “I have paid” on the success page. You can also send proof on WhatsApp.</p>
+          </div>}
           <div className="mt-6 grid gap-3 border-t border-white/10 pt-5">
             <div className="flex justify-between"><span>Subtotal</span><strong>{formatNaira(subtotal)}</strong></div>
             <div className="flex justify-between"><span>Discount</span><strong>{formatNaira(discount)}</strong></div>
+            <div className="flex justify-between"><span>Delivery</span><strong>{formatNaira(deliveryFee)}</strong></div>
             <div className="flex justify-between text-xl"><span>Total</span><strong>{formatNaira(total)}</strong></div>
           </div>
           <button disabled={loading || !items.length} className="mt-6 w-full rounded-full bg-amber-500 px-6 py-4 font-semibold text-stone-950 disabled:opacity-50">{loading ? 'Placing order...' : 'Place Order via WhatsApp'}</button>

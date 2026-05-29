@@ -11,6 +11,11 @@ export default function Shop() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('new');
   const [availability, setAvailability] = useState('all');
+  const [gender, setGender] = useState('');
+  const [scentFamily, setScentFamily] = useState('');
+  const [occasion, setOccasion] = useState('');
+  const [brandType, setBrandType] = useState('');
+  const [priceRange, setPriceRange] = useState('');
 
   useEffect(() => {
     setPageMeta({ title: 'Shop Perfumes', description: 'Browse Roc Realm Perfumes collection: designer perfumes, oil perfumes, colognes, diffusers, humidifiers, nightwear, gift sets, and lifestyle pieces in Owerri.' });
@@ -21,8 +26,16 @@ export default function Shop() {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (search) params.set('search', search);
+    if (gender) params.set('gender', gender);
+    if (scentFamily) params.set('scentFamily', scentFamily);
+    if (occasion) params.set('occasion', occasion);
+    if (brandType) params.set('brandType', brandType);
+    if (priceRange === 'under20') params.set('maxPrice', '20000');
+    if (priceRange === '20to50') { params.set('minPrice', '20000'); params.set('maxPrice', '50000'); }
+    if (priceRange === 'above50') params.set('minPrice', '50000');
+    if (priceRange === 'sale') params.set('sale', 'true');
     api.get(`/products?${params.toString()}`).then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
-  }, [category, search]);
+  }, [category, search, gender, scentFamily, occasion, brandType, priceRange]);
 
   const sorted = useMemo(() => products.filter((product) => availability === 'all' ? true : product.stock > 0).sort((a, b) => {
     const ap = Number(a.salePrice || a.price);
@@ -58,6 +71,14 @@ export default function Shop() {
           <option value="all">All stock</option>
           <option value="available">Available only</option>
         </select>
+      </div>
+
+      <div className="mt-4 grid gap-3 rounded-[2rem] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-5">
+        <select value={gender} onChange={(e) => setGender(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Gender</option><option>Female</option><option>Male</option><option>Unisex</option></select>
+        <select value={scentFamily} onChange={(e) => setScentFamily(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Scent family</option><option>Sweet</option><option>Fresh</option><option>Oud</option><option>Floral</option><option>Woody</option><option>Musk</option></select>
+        <select value={occasion} onChange={(e) => setOccasion(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Occasion</option><option>Everyday</option><option>Office</option><option>Date night</option><option>Gift</option><option>Event</option></select>
+        <select value={brandType} onChange={(e) => setBrandType(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Home Fragrance</option><option>Lifestyle</option></select>
+        <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Price/sale</option><option value="under20">Under ₦20k</option><option value="20to50">₦20k - ₦50k</option><option value="above50">₦50k+</option><option value="sale">On sale</option></select>
       </div>
 
       <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

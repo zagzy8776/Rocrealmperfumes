@@ -14,6 +14,9 @@ export default function ProductDetails() {
   const [activeImage, setActiveImage] = useState('');
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
+  const [alertPhone, setAlertPhone] = useState('');
+  const [alertName, setAlertName] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
 
@@ -34,6 +37,15 @@ export default function ProductDetails() {
   const message = encodeURIComponent(`Hello Roc Realm Perfume, I want to order ${product.name}. Quantity: ${qty}. Price: ${formatNaira(price * qty)}.`);
   const outOfStock = product.stock <= 0;
   const wished = isWishlisted(product.id);
+  const submitStockAlert = async (e) => {
+    e.preventDefault();
+    setAlertMessage('');
+    try {
+      await api.post('/stock-alerts', { productId: product.id, productName: product.name, productSlug: product.slug, customerName: alertName || null, phone: alertPhone });
+      setAlertMessage('Saved. Roc Realm will contact you when this product is available.');
+      setAlertPhone('');
+    } catch (err) { setAlertMessage(err.response?.data?.message || 'Could not save alert.'); }
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -63,6 +75,7 @@ export default function ProductDetails() {
           <a href={`https://wa.me/${whatsappNumber}?text=${message}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-4 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> WhatsApp</a>
         </div>
         <Link to="/shop" className="mt-8 inline-block font-semibold text-amber-800">Back to shop</Link>
+        {outOfStock && <form onSubmit={submitStockAlert} className="mt-8 rounded-[2rem] bg-amber-50 p-5"><h2 className="font-display text-2xl font-semibold">Notify me when available</h2><p className="mt-2 text-sm text-stone-600">Drop your WhatsApp number and admin will see your restock request.</p><div className="mt-4 grid gap-3 sm:grid-cols-2"><input placeholder="Name optional" value={alertName} onChange={(e) => setAlertName(e.target.value)} className="rounded-full bg-white px-4 py-3 outline-none" /><input required placeholder="WhatsApp number" value={alertPhone} onChange={(e) => setAlertPhone(e.target.value)} className="rounded-full bg-white px-4 py-3 outline-none" /></div><button className="mt-4 rounded-full bg-stone-950 px-6 py-3 font-semibold text-white">Notify me</button>{alertMessage && <p className="mt-3 text-sm font-semibold text-amber-900">{alertMessage}</p>}</form>}
       </div>
       </div>
       {related.length > 0 && <section className="mt-16"><h2 className="font-display text-4xl font-semibold">You may also like</h2><div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{related.map((item) => <ProductCard key={item.id} product={item} />)}</div></section>}

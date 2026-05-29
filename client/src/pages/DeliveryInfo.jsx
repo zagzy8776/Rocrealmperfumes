@@ -27,6 +27,16 @@ export default function DeliveryInfo() {
         ))}
       </section>
 
+      <section className="mt-10 rounded-[2.5rem] bg-white p-6 shadow-sm md:p-8">
+        <h2 className="font-display text-3xl font-semibold">Current delivery fees</h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl bg-amber-50 p-4"><strong>Pickup from store — Free</strong><p className="mt-1 text-sm text-stone-600">Pick up from Roc Realm Perfumes in Owerri after order confirmation.</p></div>
+          <div className="rounded-2xl bg-amber-50 p-4"><strong>Owerri delivery — ₦3,000</strong><p className="mt-1 text-sm text-stone-600">For delivery within Owerri. Rider delivery will be coordinated after confirmation.</p></div>
+          <div className="rounded-2xl bg-amber-50 p-4"><strong>Waybill / park dispatch — ₦1,000</strong><p className="mt-1 text-sm text-stone-600">Covers sending your order to the park. Transport/rider may contact you for remaining delivery cost based on location.</p></div>
+          <div className="rounded-2xl bg-amber-50 p-4"><strong>Lagos & other states dispatch — Free dispatch</strong><p className="mt-1 text-sm text-stone-600">Same-day dispatch may be available. Final transport/rider cost may depend on destination.</p></div>
+        </div>
+      </section>
+
       <section className="mt-12 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="rounded-[2.5rem] bg-white p-6 shadow-sm md:p-8">
           <div className="flex items-center gap-3"><HelpCircle className="text-amber-700" /><h2 className="font-display text-3xl font-semibold">Frequently Asked Questions</h2></div>

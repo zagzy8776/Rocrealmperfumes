@@ -87,6 +87,12 @@ async function main() {
     create: { code: 'ROC10', type: 'PERCENTAGE', value: 10, isActive: true },
   });
 
+  await prisma.promoBanner.upsert({
+    where: { id: 'default-owerri-delivery-promo' },
+    update: { title: 'Owerri Luxury Delivery', message: 'Order perfumes, oils, diffusers, and gift sets with WhatsApp confirmation and delivery coordination in Owerri.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
+    create: { id: 'default-owerri-delivery-promo', title: 'Owerri Luxury Delivery', message: 'Order perfumes, oils, diffusers, and gift sets with WhatsApp confirmation and delivery coordination in Owerri.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
+  });
+
   const testimonials = [
     ['Chidinma', 'Roc Realm helped me choose a beautiful long-lasting scent. The WhatsApp support was fast and friendly.', 'Owerri'],
     ['Somto', 'I ordered a gift set and it felt premium. Great recommendations and smooth delivery coordination.', 'Imo State'],

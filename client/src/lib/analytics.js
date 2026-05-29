@@ -27,6 +27,8 @@ const getBrowser = () => {
 };
 
 const getSource = () => {
+  const campaign = getCampaign();
+  if (campaign.source) return campaign.source;
   const referrer = document.referrer;
   if (!referrer) return 'Direct';
   try {
@@ -39,6 +41,26 @@ const getSource = () => {
     return host.replace('www.', '');
   } catch {
     return 'Referral';
+  }
+};
+
+export const getCampaign = () => {
+  const key = 'rrp_campaign';
+  const params = new URLSearchParams(window.location.search);
+  const current = {
+    source: params.get('utm_source') || '',
+    medium: params.get('utm_medium') || '',
+    campaign: params.get('utm_campaign') || '',
+    content: params.get('utm_content') || '',
+  };
+  if (current.source || current.medium || current.campaign || current.content) {
+    sessionStorage.setItem(key, JSON.stringify(current));
+    return current;
+  }
+  try {
+    return JSON.parse(sessionStorage.getItem(key)) || {};
+  } catch {
+    return {};
   }
 };
 

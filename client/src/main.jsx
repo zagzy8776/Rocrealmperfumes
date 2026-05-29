@@ -16,6 +16,10 @@ import Contact from './pages/Contact.jsx';
 import Gallery from './pages/Gallery.jsx';
 import Wishlist from './pages/Wishlist.jsx';
 import DeliveryInfo from './pages/DeliveryInfo.jsx';
+import Blog from './pages/Blog.jsx';
+import BlogPost from './pages/BlogPost.jsx';
+import PerfumeFinder from './pages/PerfumeFinder.jsx';
+import Gifts from './pages/Gifts.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import AdminProducts from './pages/admin/AdminProducts.jsx';
@@ -25,6 +29,11 @@ import AdminCategoriesCoupons from './pages/admin/AdminCategoriesCoupons.jsx';
 import AdminGallery from './pages/admin/AdminGallery.jsx';
 import AdminAnalytics from './pages/admin/AdminAnalytics.jsx';
 import AdminTestimonials from './pages/admin/AdminTestimonials.jsx';
+import AdminSales from './pages/admin/AdminSales.jsx';
+import AdminCustomers from './pages/admin/AdminCustomers.jsx';
+import AdminPromos from './pages/admin/AdminPromos.jsx';
+import AdminStockAlerts from './pages/admin/AdminStockAlerts.jsx';
+import AdminWhatsAppTemplates from './pages/admin/AdminWhatsAppTemplates.jsx';
 import './styles.css';
 
 const Protected = ({ children }) => {
@@ -48,6 +57,10 @@ createRoot(document.getElementById('root')).render(
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/about" element={<About />} />
             <Route path="/gallery" element={<Gallery />} />
+            <Route path="/gifts" element={<Gifts />} />
+            <Route path="/perfume-finder" element={<PerfumeFinder />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/delivery" element={<DeliveryInfo />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
@@ -60,6 +73,11 @@ createRoot(document.getElementById('root')).render(
             <Route path="orders/:id" element={<AdminOrderDetails />} />
             <Route path="gallery" element={<AdminGallery />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="sales" element={<AdminSales />} />
+            <Route path="customers" element={<AdminCustomers />} />
+            <Route path="promos" element={<AdminPromos />} />
+            <Route path="stock-alerts" element={<AdminStockAlerts />} />
+            <Route path="whatsapp" element={<AdminWhatsAppTemplates />} />
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="settings" element={<AdminCategoriesCoupons />} />
           </Route>

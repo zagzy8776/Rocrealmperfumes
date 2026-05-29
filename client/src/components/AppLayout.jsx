@@ -3,14 +3,18 @@ import { CreditCard, Heart, Mail, MapPin, Menu, MessageCircle, PackageCheck, Sho
 import { useState } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
-import { businessInfo, whatsappNumber } from '../lib/api.js';
+import { businessInfo, logoUrl, whatsappNumber } from '../lib/api.js';
 import FloatingWhatsApp from './FloatingWhatsApp.jsx';
 import RouteTracker from './RouteTracker.jsx';
+import PromoStrip from './PromoStrip.jsx';
 
 const nav = [
   ['Home', '/'],
   ['Shop', '/shop'],
+  ['Gifts', '/gifts'],
+  ['Finder', '/perfume-finder'],
   ['Gallery', '/gallery'],
+  ['Blog', '/blog'],
   ['Delivery', '/delivery'],
   ['About', '/about'],
   ['Contact', '/contact'],
@@ -26,9 +30,10 @@ export default function AppLayout() {
     <div className="min-h-screen bg-[#fffaf1] text-stone-900">
       <RouteTracker />
       <header className="sticky top-0 z-40 border-b border-amber-900/10 bg-[#fffaf1]/90 backdrop-blur-xl">
+        <PromoStrip />
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-950 text-amber-300"><Sparkles size={20} /></span>
+            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm"><img src={logoUrl} alt="Roc Realm logo" className="h-full w-full object-contain" /></span>
             <span>
               <strong className="font-display text-xl tracking-wide">Roc Realm</strong>
               <span className="block text-xs uppercase tracking-[0.35em] text-amber-700">Perfumes</span>

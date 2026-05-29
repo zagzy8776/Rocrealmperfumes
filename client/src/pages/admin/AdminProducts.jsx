@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Edit3, Image, ImagePlus, Plus, Search, Trash2, UploadCloud, X } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
-const empty = { name: '', description: '', price: '', salePrice: '', size: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
+const empty = { name: '', description: '', price: '', costPrice: '', salePrice: '', size: '', gender: '', scentFamily: '', occasion: '', brandType: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -38,9 +38,14 @@ export default function AdminProducts() {
       const payload = {
         ...form,
         price: Number(form.price),
+        costPrice: form.costPrice ? Number(form.costPrice) : null,
         salePrice: form.salePrice ? Number(form.salePrice) : null,
         stock: Number(form.stock),
         categoryId: form.categoryId || null,
+        gender: form.gender || null,
+        scentFamily: form.scentFamily || null,
+        occasion: form.occasion || null,
+        brandType: form.brandType || null,
         notes: form.notes.split(',').map((item) => item.trim()).filter(Boolean),
         images: form.images.split('\n').map((item) => item.trim()).filter(Boolean),
       };
@@ -58,7 +63,7 @@ export default function AdminProducts() {
 
   const edit = (product) => {
     setEditing(product.id);
-    setForm({ ...product, salePrice: product.salePrice || '', categoryId: product.categoryId || '', notes: product.notes?.join(', ') || '', images: product.images?.join('\n') || '' });
+    setForm({ ...product, costPrice: product.costPrice || '', salePrice: product.salePrice || '', categoryId: product.categoryId || '', gender: product.gender || '', scentFamily: product.scentFamily || '', occasion: product.occasion || '', brandType: product.brandType || '', notes: product.notes?.join(', ') || '', images: product.images?.join('\n') || '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -112,9 +117,14 @@ export default function AdminProducts() {
           <input required placeholder="Product name" value={form.name} onChange={(e) => update('name', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Select category</option>{categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}</select>
           <input required type="number" placeholder="Price" value={form.price} onChange={(e) => update('price', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
+          <input type="number" placeholder="Cost price admin only" value={form.costPrice || ''} onChange={(e) => update('costPrice', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input type="number" placeholder="Sale price optional" value={form.salePrice} onChange={(e) => update('salePrice', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input placeholder="Size e.g. 100ml / available sizes" value={form.size || ''} onChange={(e) => update('size', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input type="number" placeholder="Stock" value={form.stock} onChange={(e) => update('stock', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
+          <select value={form.gender || ''} onChange={(e) => update('gender', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Gender</option><option>Female</option><option>Male</option><option>Unisex</option></select>
+          <select value={form.scentFamily || ''} onChange={(e) => update('scentFamily', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Scent family</option><option>Sweet</option><option>Fresh</option><option>Oud</option><option>Floral</option><option>Woody</option><option>Musk</option></select>
+          <input placeholder="Occasion e.g. Office, Gift, Date night" value={form.occasion || ''} onChange={(e) => update('occasion', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
+          <select value={form.brandType || ''} onChange={(e) => update('brandType', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Home Fragrance</option><option>Lifestyle</option></select>
           <textarea required placeholder="Description" value={form.description} onChange={(e) => update('description', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
           <input placeholder="Notes/tags comma separated e.g. Amber, Vanilla, Gift Ready" value={form.notes} onChange={(e) => update('notes', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
           <div className="grid gap-4 rounded-[1.5rem] bg-amber-50 p-4 lg:col-span-2 md:grid-cols-[220px_1fr]">
@@ -160,7 +170,7 @@ export default function AdminProducts() {
             <img src={product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80'} alt={product.name} className="h-24 w-24 rounded-2xl bg-amber-50 object-contain p-1" />
             <div>
               <div className="flex flex-wrap items-center gap-2"><strong>{product.name}</strong>{product.isFeatured && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800">Featured</span>}{!product.isActive && <span className="rounded-full bg-red-50 px-2 py-1 text-xs text-red-700">Hidden</span>}</div>
-              <p className="mt-1 text-sm text-stone-500">{product.category?.name || 'No category'} · Stock {product.stock} · {product.size || 'No size'}</p>
+              <p className="mt-1 text-sm text-stone-500">{product.category?.name || 'No category'} · Stock {product.stock} · Cost {formatNaira(product.costPrice || 0)} · {product.size || 'No size'}</p>
             </div>
             <strong>{formatNaira(product.salePrice || product.price)}</strong>
             <div className="flex gap-2"><button onClick={() => edit(product)} className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900"><Edit3 size={15} /> Edit</button><button onClick={() => remove(product.id)} className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"><Trash2 size={15} /> Delete</button></div>

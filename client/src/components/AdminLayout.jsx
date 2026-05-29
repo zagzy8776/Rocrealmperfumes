@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { BarChart3, ExternalLink, Images, LayoutDashboard, LogOut, MessageSquareQuote, Package, ReceiptText, Settings, Sparkles } from 'lucide-react';
+import { BarChart3, Bell, ExternalLink, Images, LayoutDashboard, LogOut, Megaphone, MessageCircle, MessageSquareQuote, Package, ReceiptText, Settings, Sparkles, Users } from 'lucide-react';
+import { logoUrl } from '../lib/api.js';
 
 const links = [
   ['Dashboard', '/admin', LayoutDashboard],
@@ -7,6 +8,11 @@ const links = [
   ['Orders', '/admin/orders', ReceiptText],
   ['Gallery', '/admin/gallery', Images],
   ['Analytics', '/admin/analytics', BarChart3],
+  ['Sales', '/admin/sales', BarChart3],
+  ['Customers', '/admin/customers', Users],
+  ['Promos', '/admin/promos', Megaphone],
+  ['Stock Alerts', '/admin/stock-alerts', Bell],
+  ['WhatsApp Templates', '/admin/whatsapp', MessageCircle],
   ['Testimonials', '/admin/testimonials', MessageSquareQuote],
   ['Categories & Coupons', '/admin/settings', Settings],
 ];
@@ -23,7 +29,7 @@ export default function AdminLayout() {
       <aside className="fixed inset-y-0 left-0 hidden w-72 overflow-hidden bg-stone-950 p-6 text-white lg:block">
         <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-amber-500/20 blur-3xl" />
         <div className="relative">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-stone-950"><Sparkles size={22} /></div>
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white"><img src={logoUrl} alt="Roc Realm logo" className="h-full w-full object-contain" /></div>
           <h1 className="mt-4 font-display text-3xl">Roc Realm</h1>
           <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Luxury Admin</p>
         </div>

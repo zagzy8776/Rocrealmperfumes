@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, ShieldCheck, Sparkles } from 'lucide-react';
-import { api } from '../../lib/api.js';
+import { api, logoUrl } from '../../lib/api.js';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function AdminLogin() {
   return (
     <main className="luxury-gradient grid min-h-screen place-items-center px-4 py-10">
       <form onSubmit={submit} className="w-full max-w-md rounded-[2.5rem] border border-amber-200/30 bg-[#fffaf1] p-8 shadow-2xl">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-950 text-amber-300"><Sparkles /></div>
+        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm"><img src={logoUrl} alt="Roc Realm logo" className="h-full w-full object-contain" /></div>
         <p className="mt-6 text-sm uppercase tracking-[0.3em] text-amber-700">Secure Admin</p>
         <h1 className="mt-3 font-display text-4xl font-semibold">Roc Realm Dashboard</h1>
         <p className="mt-3 text-sm leading-6 text-stone-600">Manage products, orders, categories, and coupons for the luxury store.</p>

@@ -2,6 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>/</loc><priority>1.0</priority></url>
   <url><loc>/shop</loc><priority>0.9</priority></url>
+  <url><loc>/gifts</loc><priority>0.8</priority></url>
+  <url><loc>/perfume-finder</loc><priority>0.8</priority></url>
+  <url><loc>/blog</loc><priority>0.8</priority></url>
+  <url><loc>/blog/best-perfume-store-in-owerri</loc><priority>0.8</priority></url>
+  <url><loc>/blog/best-perfumes-for-women-in-nigeria</loc><priority>0.7</priority></url>
+  <url><loc>/blog/best-perfumes-for-men-in-nigeria</loc><priority>0.7</priority></url>
+  <url><loc>/blog/best-oil-perfumes-that-last-long</loc><priority>0.7</priority></url>
+  <url><loc>/blog/best-perfumes-for-hot-nigerian-weather</loc><priority>0.7</priority></url>
+  <url><loc>/blog/how-to-choose-a-signature-scent</loc><priority>0.7</priority></url>
+  <url><loc>/blog/best-perfume-gifts-in-nigeria</loc><priority>0.7</priority></url>
   <url><loc>/gallery</loc><priority>0.7</priority></url>
   <url><loc>/delivery</loc><priority>0.8</priority></url>
   <url><loc>/about</loc><priority>0.6</priority></url>

@@ -11,6 +11,11 @@ const statusStyles = {
   DELIVERED: 'bg-green-100 text-green-800',
   CANCELLED: 'bg-red-100 text-red-800',
 };
+const paymentStyles = {
+  UNPAID: 'bg-stone-100 text-stone-700',
+  PAYMENT_REPORTED: 'bg-amber-100 text-amber-800',
+  PAID: 'bg-green-100 text-green-800',
+};
 
 const phoneToWhatsapp = (phone) => phone?.replace(/\D/g, '').replace(/^0/, '234');
 
@@ -67,6 +72,7 @@ export default function AdminOrders() {
                   <div className="flex flex-wrap items-center gap-3">
                     <Link to={`/admin/orders/${order.id}`} className="font-display text-2xl hover:text-amber-700">{order.orderNumber}</Link>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[order.status]}`}>{order.status}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentStyles[order.paymentStatus] || paymentStyles.UNPAID}`}>{(order.paymentStatus || 'UNPAID').replaceAll('_', ' ')}</span>
                   </div>
                   <p className="mt-2 text-sm text-stone-500">{order.customerName} · {order.customerPhone}</p>
                   <p className="mt-1 text-sm text-stone-500">{order.deliveryAddress}, {order.deliveryCity}</p>
@@ -82,7 +88,7 @@ export default function AdminOrders() {
                 {order.items.map((item) => <div key={item.id} className="flex justify-between gap-4 text-sm"><span>{item.productName} x {item.quantity}</span><span>{formatNaira(item.total)}</span></div>)}
               </div>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-500">
-                <p>Payment: {order.paymentMethod} · Discount: {formatNaira(order.discount)}</p>
+                <p>Payment: {order.paymentMethod} · Delivery: {order.deliveryMethod?.replaceAll('_', ' ')} {formatNaira(order.deliveryFee || 0)} · Discount: {formatNaira((order.discount || 0) + (order.manualDiscount || 0))}</p>
                 <div className="flex gap-2">
                   <Link to={`/admin/orders/${order.id}`} className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-amber-900">Details</Link>
                   <a href={`tel:${order.customerPhone}`} className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-2 text-stone-800"><Phone size={15} /> Call</a>
