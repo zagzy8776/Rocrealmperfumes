@@ -18,7 +18,7 @@ export default function Shop() {
   const [priceRange, setPriceRange] = useState('');
 
   useEffect(() => {
-    setPageMeta({ title: 'Shop Perfumes', description: 'Browse Roc Realm Perfumes collection: designer perfumes, oil perfumes, colognes, diffusers, humidifiers, nightwear, gift sets, and lifestyle pieces in Owerri.' });
+    setPageMeta({ title: 'Shop Perfumes', description: 'Browse Roc Realm Perfumes collection: original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and home scents in Owerri.' });
     api.get('/categories').then((res) => setCategories(res.data.categories)).catch(() => setCategories([]));
   }, []);
 
@@ -50,13 +50,13 @@ export default function Shop() {
       <div className="rounded-[2.5rem] bg-stone-950 p-8 text-white md:p-12">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Shop</p>
         <h1 className="mt-3 font-display text-5xl font-semibold">Luxury Collection</h1>
-        <p className="mt-4 max-w-2xl text-stone-300">Browse designer perfumes, oil perfumes, colognes, sprays, diffusers, humidifiers, nightwear, lingeries, and gift-ready selections.</p>
+        <p className="mt-4 max-w-2xl text-stone-300">Browse original designer Arabian fragrances, oil perfumes, body mists, sprays, diffusers, humidifiers, and gift-ready selections.</p>
       </div>
 
       <div className="mt-8 grid gap-4 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm md:grid-cols-[1fr_220px_180px_180px]">
         <label className="flex items-center gap-3 rounded-full bg-stone-100 px-4">
           <Search size={18} className="text-stone-500" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search perfumes, diffusers, nightwear..." className="w-full bg-transparent py-3 outline-none" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search perfumes, body mists, diffusers..." className="w-full bg-transparent py-3 outline-none" />
         </label>
         <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none">
           <option value="">All categories</option>
@@ -77,7 +77,7 @@ export default function Shop() {
         <select value={gender} onChange={(e) => setGender(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Gender</option><option>Female</option><option>Male</option><option>Unisex</option></select>
         <select value={scentFamily} onChange={(e) => setScentFamily(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Scent family</option><option>Sweet</option><option>Fresh</option><option>Oud</option><option>Floral</option><option>Woody</option><option>Musk</option></select>
         <select value={occasion} onChange={(e) => setOccasion(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Occasion</option><option>Everyday</option><option>Office</option><option>Date night</option><option>Gift</option><option>Event</option></select>
-        <select value={brandType} onChange={(e) => setBrandType(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Home Fragrance</option><option>Lifestyle</option></select>
+        <select value={brandType} onChange={(e) => setBrandType(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Body Mist</option><option>Home Fragrance</option></select>
         <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none"><option value="">Price/sale</option><option value="under20">Under ₦20k</option><option value="20to50">₦20k - ₦50k</option><option value="above50">₦50k+</option><option value="sale">On sale</option></select>
       </div>
 

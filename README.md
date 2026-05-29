@@ -1,6 +1,6 @@
 # Roc Realm Perfumes
 
-A luxury full-stack online store for Roc Realm Nigeria Limited: designer perfumes, oil perfumes, colognes, sprays, diffusers, humidifiers, nightwear, and lingeries.
+A luxury full-stack online store for Roc Realm Nigeria Limited: original designer Arabian fragrances, oil perfumes, body mists, sprays, diffusers, humidifiers, gift sets, and home scents.
 
 ## Stack
 
@@ -120,6 +120,8 @@ Environment variables:
 
 - `VITE_API_URL=https://your-render-api.onrender.com/api`
 - `VITE_WHATSAPP_NUMBER=2349084782126`
+
+Public call line displayed on the website: `08085100229`.
 
 If you accidentally set `VITE_API_URL` to the Render root URL without `/api`, the frontend normalizes it automatically, but using `/api` in Vercel is still recommended.
 

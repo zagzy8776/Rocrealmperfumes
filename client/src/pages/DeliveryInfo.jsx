@@ -5,7 +5,7 @@ const faqs = [
   ['Do you deliver in Owerri?', 'Yes. Roc Realm coordinates delivery within Owerri and can discuss delivery options for other locations.'],
   ['Can I pay on delivery?', 'Pay on delivery may be available depending on location/order. You can also choose bank transfer or WhatsApp confirmation at checkout.'],
   ['Can you recommend a perfume?', 'Yes. Send us your budget, gender preference, scent mood, and occasion on WhatsApp and we will recommend options.'],
-  ['Do you sell gift sets?', 'Yes. Gift-ready perfume sets, diffusers, sprays, and lifestyle pieces can be selected from the shop or requested on WhatsApp.'],
+  ['Do you sell gift sets?', 'Yes. Gift-ready perfume sets, diffusers, body mists, oil perfumes, and home scents can be selected from the shop or requested on WhatsApp.'],
 ];
 
 export default function DeliveryInfo() {
@@ -14,7 +14,7 @@ export default function DeliveryInfo() {
       <section className="luxury-gradient rounded-[2.5rem] p-8 text-white md:p-12">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Delivery & Help</p>
         <h1 className="mt-3 font-display text-5xl font-semibold">Easy perfume shopping in Owerri.</h1>
-        <p className="mt-5 max-w-2xl text-stone-300">Order online, confirm on WhatsApp, and get support choosing designer perfumes, oil perfumes, diffusers, humidifiers, nightwear, and gifts.</p>
+        <p className="mt-5 max-w-2xl text-stone-300">Order online, confirm on WhatsApp, and get support choosing original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, and gifts.</p>
       </section>
 
       <section className="mt-10 grid gap-5 md:grid-cols-3">
@@ -33,7 +33,7 @@ export default function DeliveryInfo() {
           <div className="rounded-2xl bg-amber-50 p-4"><strong>Pickup from store — Free</strong><p className="mt-1 text-sm text-stone-600">Pick up from Roc Realm Perfumes in Owerri after order confirmation.</p></div>
           <div className="rounded-2xl bg-amber-50 p-4"><strong>Owerri delivery — ₦3,000</strong><p className="mt-1 text-sm text-stone-600">For delivery within Owerri. Rider delivery will be coordinated after confirmation.</p></div>
           <div className="rounded-2xl bg-amber-50 p-4"><strong>Waybill / park dispatch — ₦1,000</strong><p className="mt-1 text-sm text-stone-600">Covers sending your order to the park. Transport/rider may contact you for remaining delivery cost based on location.</p></div>
-          <div className="rounded-2xl bg-amber-50 p-4"><strong>Lagos & other states dispatch — Free dispatch</strong><p className="mt-1 text-sm text-stone-600">Same-day dispatch may be available. Final transport/rider cost may depend on destination.</p></div>
+          <div className="rounded-2xl bg-amber-50 p-4"><strong>Lagos supplier delivery / other states dispatch — Fee confirmed after order</strong><p className="mt-1 text-sm text-stone-600">Lagos orders may be sent directly from our Lagos suppliers with same-day or next-day delivery after confirmation. Other locations are coordinated based on destination.</p></div>
         </div>
       </section>
 

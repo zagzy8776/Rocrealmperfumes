@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { CreditCard, Heart, Mail, MapPin, Menu, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
+import { CreditCard, Heart, Mail, MapPin, Menu, MessageCircle, PackageCheck, Phone, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
@@ -43,6 +43,8 @@ export default function AppLayout() {
             {nav.map(([label, path]) => <NavLink key={path} to={path} className={linkClass}>{label}</NavLink>)}
           </nav>
           <div className="flex items-center gap-3">
+            <a href={`tel:${businessInfo.callLine}`} className="rounded-full border border-amber-900/20 p-3 transition hover:bg-amber-100 lg:hidden" aria-label={`Call Roc Realm on ${businessInfo.callLine}`}><Phone size={19} /></a>
+            <a href={`tel:${businessInfo.callLine}`} className="hidden rounded-full bg-stone-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-700 lg:inline-flex">Call: {businessInfo.callLine}</a>
             <Link to="/wishlist" className="relative rounded-full border border-amber-900/20 p-3 hover:bg-amber-100" aria-label="Wishlist">
               <Heart size={19} />
               {wishlistCount > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">{wishlistCount}</span>}
@@ -68,7 +70,7 @@ export default function AppLayout() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
             <h3 className="font-display text-2xl text-white">{businessInfo.name}</h3>
-            <p className="mt-3 text-sm leading-6 text-stone-400">Designer perfumes, oil perfumes, colognes, sprays, diffusers, humidifiers, nightwear, and lingeries curated for luxury everyday living.</p>
+            <p className="mt-3 text-sm leading-6 text-stone-400">Original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, and premium scents curated for confident everyday living.</p>
           </div>
           <div>
             <h4 className="font-semibold text-amber-300">Quick Links</h4>
@@ -84,10 +86,11 @@ export default function AppLayout() {
             <p className="mt-4 text-sm text-stone-400">Premium support for ordering, payment confirmation, delivery, and product consultation.</p>
             <div className="mt-5 grid gap-3 text-sm text-stone-300">
               <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition hover:text-amber-200"><MessageCircle size={17} className="text-green-400" /> WhatsApp: {businessInfo.phoneDisplay}</a>
+              <a href={`tel:${businessInfo.callLine}`} className="flex items-center gap-3 transition hover:text-amber-200"><Phone size={17} className="text-amber-300" /> Call Line: {businessInfo.callLine}</a>
               <a href={`mailto:${businessInfo.email}`} className="flex items-center gap-3 transition hover:text-amber-200"><Mail size={17} className="text-amber-300" /> Email support</a>
               <span className="flex items-center gap-3"><CreditCard size={17} className="text-amber-300" /> Bank transfer / pay on delivery</span>
               <span className="flex items-center gap-3"><PackageCheck size={17} className="text-amber-300" /> Order confirmation and tracking</span>
-              <span className="flex items-center gap-3"><Truck size={17} className="text-amber-300" /> Delivery coordination in Owerri</span>
+              <span className="flex items-center gap-3"><Truck size={17} className="text-amber-300" /> Owerri delivery plus Lagos supplier dispatch</span>
               <a href={businessInfo.mapUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition hover:text-amber-200"><MapPin size={17} className="text-red-400" /> Get directions on Google Maps</a>
             </div>
           </div>

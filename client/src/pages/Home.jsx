@@ -11,7 +11,7 @@ export default function Home() {
   const [testimonials, setTestimonials] = useState([]);
 
   useEffect(() => {
-    setPageMeta({ title: 'Luxury Perfumes in Owerri', description: 'Shop designer perfumes, oil perfumes, diffusers, humidifiers, gift sets, nightwear, and luxury lifestyle pieces from Roc Realm Perfumes in Owerri.' });
+    setPageMeta({ title: 'Luxury Perfumes in Owerri', description: 'Shop original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and premium scents from Roc Realm Perfumes in Owerri.' });
     api.get('/products?featured=true').then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
     api.get('/testimonials').then((res) => setTestimonials(res.data.testimonials)).catch(() => setTestimonials([]));
   }, []);
@@ -22,9 +22,9 @@ export default function Home() {
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=1800&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-32">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="mb-5 inline-flex rounded-full border border-amber-300/30 px-4 py-2 text-sm text-amber-200">Luxury scents, lifestyle pieces, and home fragrance in Owerri</p>
-            <h1 className="font-display text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">Discover your signature realm of fragrance and luxury.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-stone-200">Roc Realm Perfumes offers designer perfumes, oil perfumes, colognes, sprays, diffusers, humidifiers, nightwear, and lingeries for confident everyday living.</p>
+            <p className="mb-5 inline-flex rounded-full border border-amber-300/30 px-4 py-2 text-sm text-amber-200">Luxury fragrances and home scents in Owerri</p>
+            <h1 className="font-display text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">Discover your signature scent and experience luxury that lingers.</h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-stone-200">Roc Realm Perfumes offers original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, and premium scents carefully curated for confident everyday living.</p>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-7 py-4 font-semibold text-stone-950 hover:bg-amber-300">Shop Collection <ArrowRight size={18} /></Link>
               <Link to="/contact" className="rounded-full border border-white/20 px-7 py-4 font-semibold text-white hover:bg-white/10">Ask for Consultation</Link>
@@ -39,10 +39,10 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-4 md:grid-cols-4">
           {[
-            [Crown, 'Premium Selection', 'Designer perfumes, oils, colognes, and lifestyle pieces.'],
+            [Crown, 'Premium Selection', 'Designer fragrances, perfume oils, body mists, and home scents.'],
             [ShieldCheck, 'Quality First', 'Every item selected with care.'],
             [Truck, 'Owerri Delivery', 'Fast local order coordination.'],
-            [Sparkles, 'Gift Ready', 'Perfect fragrance, diffuser, and lifestyle gifts.'],
+            [Sparkles, 'Gift Ready', 'Perfect fragrance, diffuser, and home scent gifts.'],
           ].map(([Icon, title, text]) => (
             <div key={title} className="rounded-[2rem] border border-amber-900/10 bg-white p-6 shadow-sm">
               <Icon className="text-amber-700" />

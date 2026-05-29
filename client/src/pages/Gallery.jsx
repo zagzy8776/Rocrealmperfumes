@@ -54,7 +54,7 @@ export default function Gallery() {
           <div className="glass-dark rounded-[2rem] p-6 md:p-8">
             <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-amber-300"><Camera size={18} /> Gallery</p>
             <h1 className="mt-3 font-display text-5xl font-semibold">Roc Realm Moments</h1>
-            <p className="mt-4 max-w-2xl text-stone-300">New arrivals, product drops, store moments, gift ideas, nightwear pieces, diffusers, and luxury lifestyle updates.</p>
+            <p className="mt-4 max-w-2xl text-stone-300">New arrivals, product drops, store moments, gift ideas, body mists, diffusers, and luxury fragrance updates.</p>
           </div>
         </div>
 

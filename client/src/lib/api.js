@@ -48,7 +48,7 @@ export const deliveryOptions = [
   { value: 'PICKUP', label: 'Pickup from store', fee: 0, note: 'Pick up from Roc Realm Perfumes in Owerri after confirmation.' },
   { value: 'OWERRI_DELIVERY', label: 'Owerri delivery', fee: 3000, note: 'Delivery within Owerri. Rider delivery will be coordinated after order confirmation.' },
   { value: 'WAYBILL_PARK', label: 'Waybill / park dispatch', fee: 1000, note: 'Covers sending your order to the park. Transport/rider may contact you for remaining delivery cost based on location.' },
-  { value: 'OTHER_STATES_DISPATCH', label: 'Lagos & other states dispatch', fee: 0, note: 'Same-day dispatch may be available. Final transport/rider cost may depend on destination.' },
+  { value: 'OTHER_STATES_DISPATCH', label: 'Lagos supplier delivery / other states dispatch', fee: 0, note: 'Lagos orders may be sent directly from our Lagos suppliers with same-day or next-day delivery after confirmation. Other locations are coordinated based on destination.' },
 ];
 
 export const businessInfo = {
@@ -56,6 +56,7 @@ export const businessInfo = {
   brand: 'Roc Realm Perfumes',
   email: 'rocrealmnigerialimited@gmail.com',
   phoneDisplay: '+234 908 478 2126',
+  callLine: '08085100229',
   instagram: '@rocrealm_perfumes',
   tiktok: '@rocrealm_perfumes',
   instagramUrl: 'https://instagram.com/rocrealm_perfumes',

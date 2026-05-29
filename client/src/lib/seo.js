@@ -1,7 +1,7 @@
 export const setPageMeta = ({ title, description, image, url } = {}) => {
   const siteTitle = 'Roc Realm Perfumes | Luxury Perfumes in Owerri';
   const finalTitle = title ? `${title} | Roc Realm Perfumes` : siteTitle;
-  const finalDescription = description || 'Shop designer perfumes, oil perfumes, colognes, diffusers, humidifiers, gift sets, nightwear, and luxury lifestyle items in Owerri, Imo State.';
+  const finalDescription = description || 'Shop original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and home scents in Owerri, Imo State.';
 
   document.title = finalTitle;
 

@@ -68,7 +68,7 @@ export default function AdminGallery() {
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {[
           ['1. Choose picture', 'Tap the upload box and select from phone gallery or camera.'],
-          ['2. Add title', 'Example: New Dior Sauvage Arrival, Luxury Diffuser Set, Satin Nightwear.'],
+          ['2. Add title', 'Example: New Dior Sauvage Arrival, Luxury Diffuser Set, Premium Body Mist.'],
           ['3. Add caption', 'Write price, scent notes, size, promo, or “DM/WhatsApp to order”.'],
         ].map(([title, text]) => (
           <div key={title} className="glass-luxury rounded-[1.5rem] p-4">

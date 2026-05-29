@@ -12,7 +12,7 @@ const categories = [
   ['Colognes', 'Fresh colognes for everyday confidence and clean projection.'],
   ['Sprays & Diffusers', 'Room sprays, reed diffusers, and home fragrance essentials.'],
   ['Humidifiers', 'Stylish humidifiers for beautiful ambience and comfort.'],
-  ['Nightwear & Lingeries', 'Elegant nightwear and lingeries for confident lifestyle shopping.'],
+  ['Body Mists', 'Light, refreshing body mists for everyday fragrance layering.'],
   ['Female Perfumes', 'Elegant scents for women who love soft, bold, and unforgettable fragrance.'],
   ['Male Perfumes', 'Confident masculine perfumes for daily wear and special occasions.'],
   ['Unisex Perfumes', 'Balanced luxury fragrances made for everyone.'],
@@ -21,6 +21,10 @@ const categories = [
 ];
 
 const image = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
+
+const obsoleteProductSlugs = ['satin-' + 'night' + 'wear-set', 'luxury-' + 'linger' + 'ie-set'];
+const obsoleteCategorySlug = 'night' + 'wear-' + 'linger' + 'ies';
+const obsoleteProductTerms = ['Night' + 'wear', 'Linger' + 'ie'];
 
 const products = [
   ['Baccarat Rouge 540', 'Designer Perfumes', 85000, '70ml', ['Amber', 'Saffron', 'Cedar'], true, image('1594035910387-fea47794261f')],
@@ -36,8 +40,8 @@ const products = [
   ['Luxury Reed Diffuser', 'Sprays & Diffusers', 22000, '200ml', ['Vanilla', 'Amber', 'Clean Air'], true, image('1608571423902-eed4a5ad8108')],
   ['Room & Linen Spray', 'Sprays & Diffusers', 8500, '250ml', ['Fresh Linen', 'Soft Floral', 'Musk'], false, image('1600612253971-422e7f7faeb6')],
   ['Aroma Humidifier', 'Humidifiers', 28000, '500ml', ['Mist', 'LED Light', 'Aroma Ready'], true, image('1585771724684-38269d6639fd')],
-  ['Satin Nightwear Set', 'Nightwear & Lingeries', 25000, 'Available sizes', ['Soft Satin', 'Elegant', 'Comfort Fit'], false, image('1594223274512-ad4803739b7c')],
-  ['Luxury Lingerie Set', 'Nightwear & Lingeries', 30000, 'Available sizes', ['Premium Lace', 'Elegant', 'Gift Ready'], false, image('1515886657613-9f3515b0c78f')],
+  ['Premium Vanilla Body Mist', 'Body Mists', 15000, '250ml', ['Vanilla', 'Soft', 'Everyday'], false, image('1594223274512-ad4803739b7c')],
+  ['Arabian Rose Body Mist', 'Body Mists', 16000, '250ml', ['Rose', 'Fresh', 'Feminine'], false, image('1515886657613-9f3515b0c78f')],
   ['Signature Couple Gift Set', 'Gift Sets', 45000, '2 x 50ml', ['Fresh', 'Floral', 'Woody'], true, image('1519669011783-4eaa95fa1b7d')],
 ];
 
@@ -50,6 +54,24 @@ async function main() {
     where: { email: adminEmail },
     update: { password: hashed, name: process.env.ADMIN_NAME || 'Roc Realm Admin' },
     create: { email: adminEmail, password: hashed, name: process.env.ADMIN_NAME || 'Roc Realm Admin' },
+  });
+
+  await prisma.product.deleteMany({
+    where: {
+      OR: [
+        { slug: { in: obsoleteProductSlugs } },
+        ...obsoleteProductTerms.map((term) => ({ name: { contains: term, mode: 'insensitive' } })),
+      ],
+    },
+  });
+
+  await prisma.category.deleteMany({
+    where: {
+      OR: [
+        { slug: obsoleteCategorySlug },
+        ...obsoleteProductTerms.map((term) => ({ name: { contains: term, mode: 'insensitive' } })),
+      ],
+    },
   });
 
   const categoryMap = new Map();
@@ -89,8 +111,8 @@ async function main() {
 
   await prisma.promoBanner.upsert({
     where: { id: 'default-owerri-delivery-promo' },
-    update: { title: 'Owerri Luxury Delivery', message: 'Order perfumes, oils, diffusers, and gift sets with WhatsApp confirmation and delivery coordination in Owerri.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
-    create: { id: 'default-owerri-delivery-promo', title: 'Owerri Luxury Delivery', message: 'Order perfumes, oils, diffusers, and gift sets with WhatsApp confirmation and delivery coordination in Owerri.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
+    update: { title: 'Luxury Fragrance Delivery', message: 'Order perfumes, oils, body mists, diffusers, and gift sets with Owerri delivery plus Lagos supplier dispatch after confirmation.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
+    create: { id: 'default-owerri-delivery-promo', title: 'Luxury Fragrance Delivery', message: 'Order perfumes, oils, body mists, diffusers, and gift sets with Owerri delivery plus Lagos supplier dispatch after confirmation.', linkLabel: 'Shop now', linkUrl: '/shop', isActive: true },
   });
 
   const testimonials = [
