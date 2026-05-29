@@ -1,13 +1,17 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { CreditCard, Mail, MapPin, Menu, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
+import { CreditCard, Heart, Mail, MapPin, Menu, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
 import { businessInfo, whatsappNumber } from '../lib/api.js';
+import FloatingWhatsApp from './FloatingWhatsApp.jsx';
+import RouteTracker from './RouteTracker.jsx';
 
 const nav = [
   ['Home', '/'],
   ['Shop', '/shop'],
   ['Gallery', '/gallery'],
+  ['Delivery', '/delivery'],
   ['About', '/about'],
   ['Contact', '/contact'],
 ];
@@ -15,10 +19,12 @@ const nav = [
 export default function AppLayout() {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+  const { count: wishlistCount } = useWishlist();
   const linkClass = ({ isActive }) => `text-sm font-medium transition ${isActive ? 'text-amber-700' : 'text-stone-700 hover:text-amber-700'}`;
 
   return (
     <div className="min-h-screen bg-[#fffaf1] text-stone-900">
+      <RouteTracker />
       <header className="sticky top-0 z-40 border-b border-amber-900/10 bg-[#fffaf1]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
@@ -32,6 +38,10 @@ export default function AppLayout() {
             {nav.map(([label, path]) => <NavLink key={path} to={path} className={linkClass}>{label}</NavLink>)}
           </nav>
           <div className="flex items-center gap-3">
+            <Link to="/wishlist" className="relative rounded-full border border-amber-900/20 p-3 hover:bg-amber-100" aria-label="Wishlist">
+              <Heart size={19} />
+              {wishlistCount > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">{wishlistCount}</span>}
+            </Link>
             <Link to="/cart" className="relative rounded-full border border-amber-900/20 p-3 hover:bg-amber-100">
               <ShoppingBag size={19} />
               {count > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-amber-600 px-1.5 text-xs font-bold text-white">{count}</span>}
@@ -48,6 +58,7 @@ export default function AppLayout() {
         )}
       </header>
       <Outlet />
+      <FloatingWhatsApp />
       <footer className="bg-stone-950 text-stone-200">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>

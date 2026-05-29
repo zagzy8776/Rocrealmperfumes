@@ -95,7 +95,9 @@ router.put('/:id', requireAdmin, asyncHandler(async (req, res) => {
   const current = await prisma.product.findUnique({ where: { id: req.params.id } });
   if (!current) return res.status(404).json({ message: 'Product not found.' });
 
-  const nextSlug = current.name === data.name ? current.slug : makeSlug(data.name);
+  const baseSlug = makeSlug(data.name);
+  const conflicting = await prisma.product.count({ where: { slug: { startsWith: baseSlug }, id: { not: req.params.id } } });
+  const nextSlug = current.name === data.name ? current.slug : (conflicting ? `${baseSlug}-${conflicting + 1}` : baseSlug);
   const product = await prisma.product.update({
     where: { id: req.params.id },
     data: { ...data, slug: nextSlug, salePrice: data.salePrice || null, categoryId: data.categoryId || null },

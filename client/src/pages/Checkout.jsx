@@ -9,6 +9,8 @@ export default function Checkout() {
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [couponMessage, setCouponMessage] = useState('');
+  const [error, setError] = useState('');
   const [form, setForm] = useState({ customerName: '', customerPhone: '', customerEmail: '', deliveryAddress: '', deliveryCity: 'Owerri', deliveryNote: '', paymentMethod: 'BANK_TRANSFER' });
 
   const total = Math.max(0, subtotal - discount);
@@ -16,13 +18,21 @@ export default function Checkout() {
 
   const validateCoupon = async () => {
     if (!couponCode) return;
-    const res = await api.post('/coupons/validate', { code: couponCode, subtotal });
-    setDiscount(res.data.discount);
+    setCouponMessage('');
+    try {
+      const res = await api.post('/coupons/validate', { code: couponCode, subtotal });
+      setDiscount(res.data.discount);
+      setCouponMessage(`Coupon applied: ${formatNaira(res.data.discount)} off.`);
+    } catch (err) {
+      setDiscount(0);
+      setCouponMessage(err.response?.data?.message || 'Coupon is invalid or expired.');
+    }
   };
 
   const submit = async (e) => {
     e.preventDefault();
     if (!items.length) return;
+    setError('');
     setLoading(true);
     try {
       const res = await api.post('/orders', {
@@ -36,6 +46,8 @@ export default function Checkout() {
       clearCart();
       window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
       navigate('/order-success', { state: { order } });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not place order. Please try again or contact us on WhatsApp.');
     } finally {
       setLoading(false);
     }
@@ -44,6 +56,7 @@ export default function Checkout() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="font-display text-5xl font-semibold">Checkout</h1>
+      {error && <div className="mt-6 rounded-2xl bg-red-50 p-4 font-semibold text-red-700">{error}</div>}
       <form onSubmit={submit} className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="rounded-[2rem] bg-white p-6 shadow-sm">
           <div className="grid gap-4 md:grid-cols-2">
@@ -69,6 +82,7 @@ export default function Checkout() {
             <input value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} placeholder="Coupon" className="w-full rounded-full bg-white/10 px-4 py-3 outline-none" />
             <button type="button" onClick={validateCoupon} className="rounded-full bg-white/10 px-4 py-3">Apply</button>
           </div>
+          {couponMessage && <p className={`mt-2 text-sm ${discount ? 'text-green-300' : 'text-red-300'}`}>{couponMessage}</p>}
           <div className="mt-6 grid gap-3 border-t border-white/10 pt-5">
             <div className="flex justify-between"><span>Subtotal</span><strong>{formatNaira(subtotal)}</strong></div>
             <div className="flex justify-between"><span>Discount</span><strong>{formatNaira(discount)}</strong></div>

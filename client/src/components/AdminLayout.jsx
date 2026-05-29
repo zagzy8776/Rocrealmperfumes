@@ -1,11 +1,13 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { ExternalLink, Images, LayoutDashboard, LogOut, Package, ReceiptText, Settings, Sparkles } from 'lucide-react';
+import { BarChart3, ExternalLink, Images, LayoutDashboard, LogOut, MessageSquareQuote, Package, ReceiptText, Settings, Sparkles } from 'lucide-react';
 
 const links = [
   ['Dashboard', '/admin', LayoutDashboard],
   ['Products', '/admin/products', Package],
   ['Orders', '/admin/orders', ReceiptText],
   ['Gallery', '/admin/gallery', Images],
+  ['Analytics', '/admin/analytics', BarChart3],
+  ['Testimonials', '/admin/testimonials', MessageSquareQuote],
   ['Categories & Coupons', '/admin/settings', Settings],
 ];
 

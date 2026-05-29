@@ -26,12 +26,14 @@ const StatCard = ({ label, value, Icon, tone = 'amber' }) => {
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     api.get('/orders/stats/summary')
       .then((res) => setStats(res.data))
       .catch((err) => setError(err.response?.data?.message || 'Unable to load dashboard stats.'));
+    api.get('/analytics/summary').then((res) => setAnalytics(res.data)).catch(() => null);
   }, []);
 
   return (
@@ -55,6 +57,12 @@ export default function Dashboard() {
         <StatCard label="Out of Stock" value={stats?.outOfStockProducts || 0} Icon={PackageX} tone="red" />
       </div>
 
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <StatCard label="Visits Today" value={analytics?.todayVisits || 0} Icon={Sparkles} tone="amber" />
+        <StatCard label="30-Day Visits" value={analytics?.thirtyDayVisits || 0} Icon={ReceiptText} tone="blue" />
+        <StatCard label="Unique Visitors" value={analytics?.uniqueVisitors30d || 0} Icon={Boxes} tone="green" />
+      </div>
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-[2.5rem] bg-stone-950 p-8 text-white shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-stone-950"><Sparkles /></div>
@@ -71,6 +79,8 @@ export default function Dashboard() {
           <div className="mt-6 grid gap-3">
             <Link to="/admin/products" className="rounded-2xl bg-amber-50 px-5 py-4 font-semibold text-amber-900 hover:bg-amber-100">Manage Products</Link>
             <Link to="/admin/orders" className="rounded-2xl bg-stone-100 px-5 py-4 font-semibold text-stone-900 hover:bg-stone-200">View Orders</Link>
+            <Link to="/admin/analytics" className="rounded-2xl bg-stone-100 px-5 py-4 font-semibold text-stone-900 hover:bg-stone-200">View Website Analytics</Link>
+            <Link to="/admin/testimonials" className="rounded-2xl bg-stone-100 px-5 py-4 font-semibold text-stone-900 hover:bg-stone-200">Manage Testimonials</Link>
             <Link to="/admin/settings" className="rounded-2xl bg-stone-100 px-5 py-4 font-semibold text-stone-900 hover:bg-stone-200">Categories & Coupons</Link>
           </div>
         </div>

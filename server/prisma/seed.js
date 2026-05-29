@@ -87,9 +87,20 @@ async function main() {
     create: { code: 'ROC10', type: 'PERCENTAGE', value: 10, isActive: true },
   });
 
+  const testimonials = [
+    ['Chidinma', 'Roc Realm helped me choose a beautiful long-lasting scent. The WhatsApp support was fast and friendly.', 'Owerri'],
+    ['Somto', 'I ordered a gift set and it felt premium. Great recommendations and smooth delivery coordination.', 'Imo State'],
+    ['Amaka', 'The perfume oil lasted so well. I love how easy it is to order and confirm everything on WhatsApp.', 'Owerri'],
+  ];
+
+  for (const [name, quote, location] of testimonials) {
+    const existing = await prisma.testimonial.findFirst({ where: { name, quote } });
+    if (!existing) await prisma.testimonial.create({ data: { name, quote, location, rating: 5, isActive: true } });
+  }
+
   console.log('Seed completed.');
   console.log(`Admin email: ${adminEmail}`);
-  console.log(`Admin password: ${adminPassword}`);
+  console.log(`Admin password: ${process.env.ADMIN_PASSWORD ? 'configured from environment' : 'using default ChangeMe123! - change before production'}`);
 }
 
 main()

@@ -123,3 +123,33 @@ model GalleryImage {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model VisitorEvent {
+  id          String   @id @default(cuid())
+  sessionId   String?
+  path        String
+  title       String?
+  referrer    String?
+  source      String?
+  device      String?
+  browser     String?
+  productSlug String?
+  ipHash      String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@index([productSlug])
+  @@index([source])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  quote     String
+  location  String?
+  rating    Int      @default(5)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

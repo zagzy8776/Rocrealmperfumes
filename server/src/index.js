@@ -11,6 +11,8 @@ const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const couponRoutes = require('./routes/coupons');
 const galleryRoutes = require('./routes/gallery');
+const analyticsRoutes = require('./routes/analytics');
+const testimonialRoutes = require('./routes/testimonials');
 const prisma = require('./lib/prisma');
 
 const app = express();
@@ -88,6 +90,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/testimonials', testimonialRoutes);
 
 // Backward-compatible route aliases for frontend deployments that were
 // configured with the Render root URL instead of the `/api` base path.
@@ -97,6 +101,8 @@ app.use('/categories', categoryRoutes);
 app.use('/orders', orderRoutes);
 app.use('/coupons', couponRoutes);
 app.use('/gallery', galleryRoutes);
+app.use('/analytics', analyticsRoutes);
+app.use('/testimonials', testimonialRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found.' });
@@ -107,6 +113,10 @@ app.use((error, req, res, next) => {
 
   if (error.name === 'ZodError') {
     return res.status(400).json({ message: 'Validation error.', errors: error.issues });
+  }
+
+  if (error.statusCode) {
+    return res.status(error.statusCode).json({ message: error.message });
   }
 
   if (error.code === 'P2002') {

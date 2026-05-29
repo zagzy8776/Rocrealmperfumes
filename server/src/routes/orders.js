@@ -34,6 +34,11 @@ router.post('/', asyncHandler(async (req, res) => {
   const productMap = new Map(products.map((product) => [product.id, product]));
   const orderItems = data.items.map((item) => {
     const product = productMap.get(item.productId);
+    if (item.quantity > product.stock) {
+      const error = new Error(`${product.name} has only ${product.stock} available.`);
+      error.statusCode = 400;
+      throw error;
+    }
     const unitPrice = Number(product.salePrice || product.price);
     return {
       productId: product.id,
@@ -56,23 +61,32 @@ router.post('/', asyncHandler(async (req, res) => {
   const discount = calculateDiscount(coupon, subtotal);
   const total = Math.max(0, subtotal - discount);
 
-  const order = await prisma.order.create({
-    data: {
-      orderNumber: makeOrderNumber(),
-      customerName: data.customerName,
-      customerPhone: data.customerPhone,
-      customerEmail: data.customerEmail || null,
-      deliveryAddress: data.deliveryAddress,
-      deliveryCity: data.deliveryCity || null,
-      deliveryNote: data.deliveryNote || null,
-      paymentMethod: data.paymentMethod,
-      couponCode: coupon?.code || null,
-      subtotal,
-      discount,
-      total,
-      items: { create: orderItems },
-    },
-    include: { items: true },
+  const order = await prisma.$transaction(async (tx) => {
+    const created = await tx.order.create({
+      data: {
+        orderNumber: makeOrderNumber(),
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        customerEmail: data.customerEmail || null,
+        deliveryAddress: data.deliveryAddress,
+        deliveryCity: data.deliveryCity || null,
+        deliveryNote: data.deliveryNote || null,
+        paymentMethod: data.paymentMethod,
+        couponCode: coupon?.code || null,
+        subtotal,
+        discount,
+        total,
+        items: { create: orderItems },
+      },
+      include: { items: true },
+    });
+
+    await Promise.all(data.items.map((item) => tx.product.update({
+      where: { id: item.productId },
+      data: { stock: { decrement: item.quantity } },
+    })));
+
+    return created;
   });
 
   res.status(201).json({ order: formatOrder(order) });

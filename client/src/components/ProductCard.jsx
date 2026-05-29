@@ -1,17 +1,32 @@
 import { Link } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-react';
 import { formatNaira } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
   const image = product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80';
+  const outOfStock = product.stock <= 0;
+  const lowStock = product.stock > 0 && product.stock <= 3;
+  const wished = isWishlisted(product.id);
 
   return (
     <article className="group overflow-hidden rounded-[1.2rem] border border-amber-900/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl sm:rounded-[1.5rem]">
-      <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
+      <div className="relative">
+        <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
         <img src={image} alt={product.name} className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
-      </Link>
+        </Link>
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+          {product.salePrice && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-bold text-white">SALE</span>}
+          {product.isFeatured && <span className="rounded-full bg-amber-500 px-2 py-1 text-[10px] font-bold text-stone-950">BEST</span>}
+          {lowStock && <span className="rounded-full bg-stone-950 px-2 py-1 text-[10px] font-bold text-white">LIMITED</span>}
+        </div>
+        <button onClick={() => toggleWishlist(product)} className={`absolute right-2 top-2 rounded-full p-2 shadow-sm ${wished ? 'bg-red-500 text-white' : 'bg-white/90 text-stone-700'}`} aria-label="Toggle wishlist">
+          <Heart size={15} fill={wished ? 'currentColor' : 'none'} />
+        </button>
+      </div>
       <div className="p-3 sm:p-4">
         <p className="truncate text-[10px] uppercase tracking-[0.18em] text-amber-700 sm:text-xs">{product.category?.name || 'Perfume'}</p>
         <Link to={`/product/${product.slug}`} className="mt-1 line-clamp-2 font-display text-sm font-semibold leading-tight text-stone-950 sm:text-lg">{product.name}</Link>
@@ -21,10 +36,11 @@ export default function ProductCard({ product }) {
             {product.salePrice && <span className="block truncate text-[11px] text-stone-400 line-through sm:text-xs">{formatNaira(product.price)}</span>}
             <strong className="block truncate text-xs text-stone-950 sm:text-base">{formatNaira(product.salePrice || product.price)}</strong>
           </div>
-          <button onClick={() => addToCart(product)} className="shrink-0 rounded-full bg-stone-950 p-2 text-amber-200 transition hover:bg-amber-700 hover:text-white sm:p-3" aria-label="Add to cart">
+          <button disabled={outOfStock} onClick={() => addToCart(product)} className="shrink-0 rounded-full bg-stone-950 p-2 text-amber-200 transition hover:bg-amber-700 hover:text-white disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500 sm:p-3" aria-label="Add to cart">
             <ShoppingBag size={15} />
           </button>
         </div>
+        {outOfStock && <p className="mt-2 text-xs font-semibold text-red-600">Out of stock</p>}
       </div>
     </article>
   );

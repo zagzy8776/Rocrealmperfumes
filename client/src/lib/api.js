@@ -17,6 +17,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+      localStorage.removeItem('rrp_admin_token');
+      window.location.href = '/admin/login';
+    }
+    return Promise.reject(error);
+  },
+);
+
 export const formatNaira = (value) => new Intl.NumberFormat('en-NG', {
   style: 'currency',
   currency: 'NGN',

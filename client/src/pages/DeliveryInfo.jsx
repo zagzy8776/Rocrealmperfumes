@@ -1,0 +1,46 @@
+import { CreditCard, HelpCircle, MapPin, MessageCircle, PackageCheck, Truck } from 'lucide-react';
+import { businessInfo, whatsappNumber } from '../lib/api.js';
+
+const faqs = [
+  ['Do you deliver in Owerri?', 'Yes. Roc Realm coordinates delivery within Owerri and can discuss delivery options for other locations.'],
+  ['Can I pay on delivery?', 'Pay on delivery may be available depending on location/order. You can also choose bank transfer or WhatsApp confirmation at checkout.'],
+  ['Can you recommend a perfume?', 'Yes. Send us your budget, gender preference, scent mood, and occasion on WhatsApp and we will recommend options.'],
+  ['Do you sell gift sets?', 'Yes. Gift-ready perfume sets, diffusers, sprays, and lifestyle pieces can be selected from the shop or requested on WhatsApp.'],
+];
+
+export default function DeliveryInfo() {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <section className="luxury-gradient rounded-[2.5rem] p-8 text-white md:p-12">
+        <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Delivery & Help</p>
+        <h1 className="mt-3 font-display text-5xl font-semibold">Easy perfume shopping in Owerri.</h1>
+        <p className="mt-5 max-w-2xl text-stone-300">Order online, confirm on WhatsApp, and get support choosing designer perfumes, oil perfumes, diffusers, humidifiers, nightwear, and gifts.</p>
+      </section>
+
+      <section className="mt-10 grid gap-5 md:grid-cols-3">
+        {[
+          [Truck, 'Owerri delivery', 'Fast coordination for customers in Owerri and nearby areas.'],
+          [CreditCard, 'Flexible payment', 'Bank transfer, pay on delivery, or WhatsApp confirmation.'],
+          [PackageCheck, 'Order confirmation', 'Every order is saved and sent to WhatsApp for quick follow-up.'],
+        ].map(([Icon, title, text]) => (
+          <div key={title} className="rounded-[2rem] bg-white p-6 shadow-sm"><Icon className="text-amber-700" /><h2 className="mt-4 font-display text-2xl font-semibold">{title}</h2><p className="mt-2 text-stone-600">{text}</p></div>
+        ))}
+      </section>
+
+      <section className="mt-12 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-[2.5rem] bg-white p-6 shadow-sm md:p-8">
+          <div className="flex items-center gap-3"><HelpCircle className="text-amber-700" /><h2 className="font-display text-3xl font-semibold">Frequently Asked Questions</h2></div>
+          <div className="mt-6 grid gap-4">
+            {faqs.map(([question, answer]) => <div key={question} className="rounded-2xl bg-amber-50 p-5"><h3 className="font-semibold text-stone-950">{question}</h3><p className="mt-2 text-sm leading-6 text-stone-600">{answer}</p></div>)}
+          </div>
+        </div>
+        <aside className="h-fit rounded-[2.5rem] bg-stone-950 p-7 text-white">
+          <h2 className="font-display text-3xl">Need help now?</h2>
+          <p className="mt-3 text-stone-300">Chat with Roc Realm for scent recommendations, delivery questions, product availability, and gift ideas.</p>
+          <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-600 px-6 py-4 font-semibold text-white"><MessageCircle size={18} /> WhatsApp us</a>
+          <a href={businessInfo.mapUrl} target="_blank" rel="noreferrer" className="mt-3 flex items-center gap-2 text-sm text-amber-200"><MapPin size={16} /> Get directions in Owerri</a>
+        </aside>
+      </section>
+    </main>
+  );
+}

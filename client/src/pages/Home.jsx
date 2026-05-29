@@ -3,13 +3,17 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Crown, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { api } from '../lib/api.js';
+import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
 
   useEffect(() => {
+    setPageMeta({ title: 'Luxury Perfumes in Owerri', description: 'Shop designer perfumes, oil perfumes, diffusers, humidifiers, gift sets, nightwear, and luxury lifestyle pieces from Roc Realm Perfumes in Owerri.' });
     api.get('/products?featured=true').then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
+    api.get('/testimonials').then((res) => setTestimonials(res.data.testimonials)).catch(() => setTestimonials([]));
   }, []);
 
   return (
@@ -59,6 +63,33 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="luxury-gradient rounded-[2.5rem] p-8 text-white md:p-12">
+          <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Shop by mood</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold">Find the perfect scent for every moment.</h2>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {['Fresh office scent', 'Sweet date night', 'Luxury oud mood', 'Gift-ready picks'].map((mood) => <Link key={mood} to={`/shop?search=${encodeURIComponent(mood.split(' ')[0])}`} className="rounded-2xl bg-white/10 p-5 font-semibold text-amber-100 transition hover:bg-white/15">{mood}</Link>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-amber-700">Trust</p>
+            <h2 className="mt-3 font-display text-4xl font-semibold">Why Owerri shoppers choose Roc Realm.</h2>
+            <p className="mt-4 leading-8 text-stone-600">Premium product selection, WhatsApp consultation, fast order confirmation, and a luxury shopping feel from first click to delivery.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {(testimonials.length ? testimonials.slice(0, 3) : [
+              { name: 'Happy Customer', quote: 'The scent recommendation was perfect and delivery was smooth.', location: 'Owerri', rating: 5 },
+              { name: 'Gift Buyer', quote: 'Beautiful perfume options and quick WhatsApp confirmation.', location: 'Imo State', rating: 5 },
+              { name: 'Roc Realm Client', quote: 'Premium service and lovely fragrance choices.', location: 'Nigeria', rating: 5 },
+            ]).map((item) => <div key={`${item.name}-${item.quote}`} className="rounded-[2rem] bg-white p-6 shadow-sm"><p className="text-amber-600">{'★'.repeat(item.rating || 5)}</p><p className="mt-3 text-sm leading-6 text-stone-600">“{item.quote}”</p><strong className="mt-4 block">{item.name}</strong><span className="text-xs text-stone-500">{item.location}</span></div>)}
+          </div>
         </div>
       </section>
     </main>

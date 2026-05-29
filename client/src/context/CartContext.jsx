@@ -16,11 +16,13 @@ export const CartProvider = ({ children }) => {
   }, [items]);
 
   const addToCart = (product, quantity = 1) => {
+    if (product.stock <= 0) return;
     setItems((current) => {
       const existing = current.find((item) => item.id === product.id);
       const unitPrice = Number(product.salePrice || product.price);
+      const nextQuantity = Math.min(Number(product.stock || 1), Number(quantity || 1));
       if (existing) {
-        return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item);
+        return current.map((item) => item.id === product.id ? { ...item, quantity: Math.min(item.stock || product.stock || 99, item.quantity + nextQuantity) } : item);
       }
       return [...current, {
         id: product.id,
@@ -28,7 +30,8 @@ export const CartProvider = ({ children }) => {
         slug: product.slug,
         image: product.images?.[0],
         price: unitPrice,
-        quantity,
+        quantity: nextQuantity,
+        stock: Number(product.stock || 0),
       }];
     });
   };
@@ -37,7 +40,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => setItems([]);
   const updateQuantity = (id, quantity) => {
     if (quantity <= 0) return removeFromCart(id);
-    setItems((current) => current.map((item) => item.id === id ? { ...item, quantity } : item));
+    setItems((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.min(item.stock || 99, quantity) } : item));
   };
 
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);

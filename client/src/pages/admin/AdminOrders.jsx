@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AlertCircle, MessageCircle, Phone, Search } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
@@ -64,7 +65,7 @@ export default function AdminOrders() {
               <div className="flex flex-wrap justify-between gap-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="font-display text-2xl">{order.orderNumber}</h2>
+                    <Link to={`/admin/orders/${order.id}`} className="font-display text-2xl hover:text-amber-700">{order.orderNumber}</Link>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[order.status]}`}>{order.status}</span>
                   </div>
                   <p className="mt-2 text-sm text-stone-500">{order.customerName} · {order.customerPhone}</p>
@@ -83,6 +84,7 @@ export default function AdminOrders() {
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-500">
                 <p>Payment: {order.paymentMethod} · Discount: {formatNaira(order.discount)}</p>
                 <div className="flex gap-2">
+                  <Link to={`/admin/orders/${order.id}`} className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-amber-900">Details</Link>
                   <a href={`tel:${order.customerPhone}`} className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-2 text-stone-800"><Phone size={15} /> Call</a>
                   {whatsapp && <a href={`https://wa.me/${whatsapp}?text=${message}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-green-800"><MessageCircle size={15} /> WhatsApp</a>}
                 </div>

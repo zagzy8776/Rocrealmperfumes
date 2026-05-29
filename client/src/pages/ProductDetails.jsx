@@ -1,28 +1,48 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { MessageCircle, ShoppingBag } from 'lucide-react';
+import { Heart, MessageCircle, ShoppingBag } from 'lucide-react';
 import { api, formatNaira, whatsappNumber } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
+import { setPageMeta } from '../lib/seo.js';
+import ProductCard from '../components/ProductCard.jsx';
 
 export default function ProductDetails() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [activeImage, setActiveImage] = useState('');
+  const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
 
   useEffect(() => {
-    api.get(`/products/${slug}`).then((res) => setProduct(res.data.product)).catch(() => setProduct(null));
+    setLoading(true);
+    api.get(`/products/${slug}`).then((res) => {
+      setProduct(res.data.product);
+      setActiveImage(res.data.product.images?.[0] || '');
+      setPageMeta({ title: res.data.product.name, description: res.data.product.description, image: res.data.product.images?.[0] });
+      return api.get(`/products?category=${res.data.product.category?.slug || ''}`);
+    }).then((res) => setRelated(res.data.products.filter((item) => item.slug !== slug).slice(0, 5))).catch(() => setProduct(null)).finally(() => setLoading(false));
   }, [slug]);
 
-  if (!product) return <main className="mx-auto max-w-7xl px-4 py-20 text-center">Loading product...</main>;
+  if (loading) return <main className="mx-auto max-w-7xl px-4 py-20 text-center">Loading product...</main>;
+  if (!product) return <main className="mx-auto max-w-7xl px-4 py-20 text-center"><h1 className="font-display text-4xl">Product not found</h1><Link to="/shop" className="mt-5 inline-block rounded-full bg-stone-950 px-6 py-3 text-white">Back to shop</Link></main>;
 
   const price = product.salePrice || product.price;
   const message = encodeURIComponent(`Hello Roc Realm Perfume, I want to order ${product.name}. Quantity: ${qty}. Price: ${formatNaira(price * qty)}.`);
+  const outOfStock = product.stock <= 0;
+  const wished = isWishlisted(product.id);
 
   return (
-    <main className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8">
-      <div className="overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm">
-        <img src={product.images?.[0]} alt={product.name} className="h-[32rem] w-full object-contain" />
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="grid gap-10 lg:grid-cols-2">
+      <div>
+        <div className="overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm">
+          <img src={activeImage || product.images?.[0]} alt={product.name} className="h-[32rem] w-full object-contain" />
+        </div>
+        {product.images?.length > 1 && <div className="mt-4 flex gap-3 overflow-auto pb-2">{product.images.map((image) => <button key={image} onClick={() => setActiveImage(image)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white p-1 ${activeImage === image ? 'border-amber-600' : 'border-transparent'}`}><img src={image} alt={product.name} className="h-full w-full object-contain" /></button>)}</div>}
       </div>
       <div className="py-6">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-700">{product.category?.name}</p>
@@ -35,14 +55,17 @@ export default function ProductDetails() {
         <div className="mt-6 flex flex-wrap gap-2">
           {product.notes?.map((note) => <span key={note} className="rounded-full bg-amber-100 px-4 py-2 text-sm text-amber-900">{note}</span>)}
         </div>
-        <p className="mt-5 text-sm text-stone-500">Size: {product.size || 'Available on request'} · Stock: {product.stock > 0 ? 'In stock' : 'Out of stock'}</p>
+        <p className="mt-5 text-sm text-stone-500">Size: {product.size || 'Available on request'} · Stock: {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}</p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <input type="number" min="1" value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value)))} className="w-24 rounded-full border border-amber-900/20 px-4 py-3" />
-          <button onClick={() => addToCart(product, qty)} className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-7 py-4 font-semibold text-white hover:bg-amber-700"><ShoppingBag size={18} /> Add to Cart</button>
+          <input type="number" min="1" max={product.stock || 1} value={qty} onChange={(e) => setQty(Math.min(product.stock || 1, Math.max(1, Number(e.target.value))))} className="w-24 rounded-full border border-amber-900/20 px-4 py-3" />
+          <button disabled={outOfStock} onClick={() => addToCart(product, qty)} className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-7 py-4 font-semibold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-stone-300"><ShoppingBag size={18} /> {outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
+          <button onClick={() => toggleWishlist(product)} className={`inline-flex items-center gap-2 rounded-full px-7 py-4 font-semibold ${wished ? 'bg-red-500 text-white' : 'bg-amber-100 text-amber-900'}`}><Heart size={18} fill={wished ? 'currentColor' : 'none'} /> Wishlist</button>
           <a href={`https://wa.me/${whatsappNumber}?text=${message}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-4 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> WhatsApp</a>
         </div>
         <Link to="/shop" className="mt-8 inline-block font-semibold text-amber-800">Back to shop</Link>
       </div>
+      </div>
+      {related.length > 0 && <section className="mt-16"><h2 className="font-display text-4xl font-semibold">You may also like</h2><div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{related.map((item) => <ProductCard key={item.id} product={item} />)}</div></section>}
     </main>
   );
 }
