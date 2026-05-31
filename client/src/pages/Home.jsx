@@ -19,7 +19,6 @@ export default function Home() {
   return (
     <main>
       <section className="luxury-gradient relative overflow-hidden text-white">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=1800&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-32">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="mb-5 inline-flex rounded-full border border-amber-300/30 px-4 py-2 text-sm text-amber-200">Luxury fragrances and home scents in Owerri</p>
@@ -29,9 +28,6 @@ export default function Home() {
               <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-7 py-4 font-semibold text-stone-950 hover:bg-amber-300">Shop Collection <ArrowRight size={18} /></Link>
               <Link to="/contact" className="rounded-full border border-white/20 px-7 py-4 font-semibold text-white hover:bg-white/10">Ask for Consultation</Link>
             </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="glass-card rounded-[3rem] p-5">
-            <img className="h-[32rem] w-full rounded-[2.4rem] object-cover" src="https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1200&q=80" alt="Luxury perfume bottles" />
           </motion.div>
         </div>
       </section>

@@ -20,7 +20,8 @@ const upload = multer({
 
 const productSchema = z.object({
   name: z.string().min(2),
-  description: z.string().min(10),
+  description: z.string().min(10).optional().nullable(),
+
   price: z.coerce.number().positive(),
   costPrice: z.coerce.number().positive().optional().nullable(),
   salePrice: z.coerce.number().positive().optional().nullable(),
@@ -38,20 +39,14 @@ const productSchema = z.object({
 });
 
 router.get('/', asyncHandler(async (req, res) => {
-  const { search, category, featured, active, gender, scentFamily, occasion, brandType, minPrice, maxPrice, sale } = req.query;
-  const min = minPrice ? Number(minPrice) : undefined;
-  const max = maxPrice ? Number(maxPrice) : undefined;
+  const { search, category, featured, active } = req.query;
+
 
   const products = await prisma.product.findMany({
     where: {
       isActive: active === 'false' ? undefined : true,
       isFeatured: featured === 'true' ? true : undefined,
-      gender: gender ? { equals: String(gender), mode: 'insensitive' } : undefined,
-      scentFamily: scentFamily ? { equals: String(scentFamily), mode: 'insensitive' } : undefined,
-      occasion: occasion ? { contains: String(occasion), mode: 'insensitive' } : undefined,
-      brandType: brandType ? { equals: String(brandType), mode: 'insensitive' } : undefined,
-      salePrice: sale === 'true' ? { not: null } : undefined,
-      price: min !== undefined || max !== undefined ? { gte: min, lte: max } : undefined,
+
       category: category ? { slug: String(category) } : undefined,
       OR: search ? [
         { name: { contains: String(search), mode: 'insensitive' } },
@@ -96,7 +91,8 @@ router.post('/', requireAdmin, asyncHandler(async (req, res) => {
   const slug = existing ? `${baseSlug}-${existing + 1}` : baseSlug;
 
   const product = await prisma.product.create({
-    data: { ...data, slug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+    data: { ...data, description: data.description || null, slug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+
     include: { category: true },
   });
 
@@ -113,7 +109,8 @@ router.put('/:id', requireAdmin, asyncHandler(async (req, res) => {
   const nextSlug = current.name === data.name ? current.slug : (conflicting ? `${baseSlug}-${conflicting + 1}` : baseSlug);
   const product = await prisma.product.update({
     where: { id: req.params.id },
-    data: { ...data, slug: nextSlug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+    data: { ...data, description: data.description || null, slug: nextSlug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+
     include: { category: true },
   });
 

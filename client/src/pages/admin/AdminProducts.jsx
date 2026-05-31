@@ -125,7 +125,8 @@ export default function AdminProducts() {
           <select value={form.scentFamily || ''} onChange={(e) => update('scentFamily', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Scent family</option><option>Sweet</option><option>Fresh</option><option>Oud</option><option>Floral</option><option>Woody</option><option>Musk</option></select>
           <input placeholder="Occasion e.g. Office, Gift, Date night" value={form.occasion || ''} onChange={(e) => update('occasion', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <select value={form.brandType || ''} onChange={(e) => update('brandType', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Body Mist</option><option>Home Fragrance</option></select>
-          <textarea required placeholder="Description" value={form.description} onChange={(e) => update('description', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
+          <textarea placeholder="Description" value={form.description} onChange={(e) => update('description', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
+
           <input placeholder="Notes/tags comma separated e.g. Amber, Vanilla, Gift Ready" value={form.notes} onChange={(e) => update('notes', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
           <div className="grid gap-4 rounded-[1.5rem] bg-amber-50 p-4 lg:col-span-2 md:grid-cols-[220px_1fr]">
             <label className="grid min-h-44 cursor-pointer place-items-center overflow-hidden rounded-[1.2rem] border-2 border-dashed border-amber-300 bg-white/70 text-center transition hover:bg-amber-100">

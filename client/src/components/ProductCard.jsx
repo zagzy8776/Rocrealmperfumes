@@ -9,7 +9,7 @@ export default function ProductCard({ product }) {
   const { toggleWishlist, isWishlisted } = useWishlist();
   const image = product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80';
   const outOfStock = product.stock <= 0;
-  const lowStock = product.stock > 0 && product.stock <= 3;
+
   const wished = isWishlisted(product.id);
 
   return (
@@ -21,7 +21,7 @@ export default function ProductCard({ product }) {
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           {product.salePrice && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-bold text-white">SALE</span>}
           {product.isFeatured && <span className="rounded-full bg-amber-500 px-2 py-1 text-[10px] font-bold text-stone-950">BEST</span>}
-          {lowStock && <span className="rounded-full bg-stone-950 px-2 py-1 text-[10px] font-bold text-white">LIMITED</span>}
+
         </div>
         <button onClick={() => toggleWishlist(product)} className={`absolute right-2 top-2 rounded-full p-2 shadow-sm ${wished ? 'bg-red-500 text-white' : 'bg-white/90 text-stone-700'}`} aria-label="Toggle wishlist">
           <Heart size={15} fill={wished ? 'currentColor' : 'none'} />
@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
       <div className="p-3 sm:p-4">
         <p className="truncate text-[10px] uppercase tracking-[0.18em] text-amber-700 sm:text-xs">{product.category?.name || 'Perfume'}</p>
         <Link to={`/product/${product.slug}`} className="mt-1 line-clamp-2 font-display text-sm font-semibold leading-tight text-stone-950 sm:text-lg">{product.name}</Link>
-        <p className="mt-2 hidden line-clamp-2 text-xs text-stone-600 sm:block">{product.description}</p>
+
         <div className="mt-3 flex items-center justify-between gap-2">
           <div className="min-w-0">
             {product.salePrice && <span className="block truncate text-[11px] text-stone-400 line-through sm:text-xs">{formatNaira(product.price)}</span>}
@@ -40,7 +40,7 @@ export default function ProductCard({ product }) {
             <ShoppingBag size={15} />
           </button>
         </div>
-        {outOfStock && <p className="mt-2 text-xs font-semibold text-red-600">Out of stock</p>}
+
       </div>
     </article>
   );

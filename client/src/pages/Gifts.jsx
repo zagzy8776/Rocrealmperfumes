@@ -3,13 +3,11 @@ import { api } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
 
 const sections = [
-  ['Gifts for her', 'female'],
-  ['Gifts for him', 'male'],
-  ['Birthday gifts', 'gift'],
+  ['Gift Sets', 'gift'],
   ['Under ₦20k', 'under20'],
-  ['Luxury gifts', 'luxury'],
-  ['Couple sets', 'couple'],
+  ['Luxury Gifts', 'luxury'],
 ];
+
 
 export default function Gifts() {
   const [products, setProducts] = useState([]);

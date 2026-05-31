@@ -36,6 +36,7 @@ export default function ProductDetails() {
   const price = product.salePrice || product.price;
   const message = encodeURIComponent(`Hello Roc Realm Perfume, I want to order ${product.name}. Quantity: ${qty}. Price: ${formatNaira(price * qty)}.`);
   const outOfStock = product.stock <= 0;
+
   const wished = isWishlisted(product.id);
   const submitStockAlert = async (e) => {
     e.preventDefault();
@@ -53,6 +54,7 @@ export default function ProductDetails() {
       <div>
         <div className="overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm">
           <img src={activeImage || product.images?.[0]} alt={product.name} className="h-[32rem] w-full object-contain" />
+
         </div>
         {product.images?.length > 1 && <div className="mt-4 flex gap-3 overflow-auto pb-2">{product.images.map((image) => <button key={image} onClick={() => setActiveImage(image)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white p-1 ${activeImage === image ? 'border-amber-600' : 'border-transparent'}`}><img src={image} alt={product.name} className="h-full w-full object-contain" /></button>)}</div>}
       </div>
@@ -63,14 +65,18 @@ export default function ProductDetails() {
           {product.salePrice && <span className="text-xl text-stone-400 line-through">{formatNaira(product.price)}</span>}
           <strong className="text-3xl text-stone-950">{formatNaira(price)}</strong>
         </div>
-        <p className="mt-6 leading-8 text-stone-600">{product.description}</p>
+        <p className="mt-6 leading-8 text-stone-600">{product.description ? product.description : ''}</p>
+
         <div className="mt-6 flex flex-wrap gap-2">
           {product.notes?.map((note) => <span key={note} className="rounded-full bg-amber-100 px-4 py-2 text-sm text-amber-900">{note}</span>)}
         </div>
-        <p className="mt-5 text-sm text-stone-500">Size: {product.size || 'Available on request'} · Stock: {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}</p>
+        <p className="mt-5 text-sm text-stone-500">Size: {product.size || 'Available on request'}</p>
+
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <input type="number" min="1" max={product.stock || 1} value={qty} onChange={(e) => setQty(Math.min(product.stock || 1, Math.max(1, Number(e.target.value))))} className="w-24 rounded-full border border-amber-900/20 px-4 py-3" />
-          <button disabled={outOfStock} onClick={() => addToCart(product, qty)} className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-7 py-4 font-semibold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-stone-300"><ShoppingBag size={18} /> {outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
+          <input type="number" min="1" value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value)))} className="w-24 rounded-full border border-amber-900/20 px-4 py-3" />
+
+          <button disabled={outOfStock} onClick={() => addToCart(product, qty)} className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-7 py-4 font-semibold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-stone-300"><ShoppingBag size={18} /> Add to Cart</button>
+
           <button onClick={() => toggleWishlist(product)} className={`inline-flex items-center gap-2 rounded-full px-7 py-4 font-semibold ${wished ? 'bg-red-500 text-white' : 'bg-amber-100 text-amber-900'}`}><Heart size={18} fill={wished ? 'currentColor' : 'none'} /> Wishlist</button>
           <a href={`https://wa.me/${whatsappNumber}?text=${message}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-4 font-semibold text-white hover:bg-green-700"><MessageCircle size={18} /> WhatsApp</a>
         </div>
