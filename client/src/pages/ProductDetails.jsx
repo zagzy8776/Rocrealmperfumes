@@ -65,7 +65,7 @@ export default function ProductDetails() {
           {product.salePrice && <span className="text-xl text-stone-400 line-through">{formatNaira(product.price)}</span>}
           <strong className="text-3xl text-stone-950">{formatNaira(price)}</strong>
         </div>
-        <p className="mt-6 leading-8 text-stone-600">{product.description ? product.description : ''}</p>
+        {product.description && <p className="mt-6 leading-8 text-stone-600">{product.description}</p>}
 
         <div className="mt-6 flex flex-wrap gap-2">
           {product.notes?.map((note) => <span key={note} className="rounded-full bg-amber-100 px-4 py-2 text-sm text-amber-900">{note}</span>)}

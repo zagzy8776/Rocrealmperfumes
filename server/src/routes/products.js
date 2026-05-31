@@ -20,7 +20,10 @@ const upload = multer({
 
 const productSchema = z.object({
   name: z.string().min(2),
-  description: z.string().min(10).optional().nullable(),
+  description: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
+    z.string().min(2).optional().nullable(),
+  ),
 
   price: z.coerce.number().positive(),
   costPrice: z.coerce.number().positive().optional().nullable(),

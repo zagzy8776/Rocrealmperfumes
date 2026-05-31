@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2, Edit3, Image, ImagePlus, Plus, Search, Trash2, UploadCloud, X } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
-const empty = { name: '', description: '', price: '', costPrice: '', salePrice: '', size: '', gender: '', scentFamily: '', occasion: '', brandType: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
+const empty = { name: '', description: '', price: '', costPrice: '', salePrice: '', size: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -104,7 +104,7 @@ export default function AdminProducts() {
         <div>
           <p className="text-sm uppercase tracking-[0.28em] text-amber-700">Inventory</p>
           <h1 className="mt-2 font-display text-4xl font-semibold">Products</h1>
-          <p className="mt-2 text-stone-600">Add designer Arabian fragrances, oils, body mists, diffusers, humidifiers, and more.</p>
+          <p className="mt-2 text-stone-600">Add products and assign them to the brand/category you created.</p>
         </div>
         {editing && <button onClick={cancelEdit} className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-700 shadow-sm"><X size={16} /> Cancel Edit</button>}
       </div>
@@ -115,16 +115,12 @@ export default function AdminProducts() {
       <form onSubmit={submit} className="mt-6 grid gap-6 rounded-[2.5rem] border border-amber-900/10 bg-white p-6 shadow-sm xl:grid-cols-[1fr_280px]">
         <div className="grid gap-4 lg:grid-cols-2">
           <input required placeholder="Product name" value={form.name} onChange={(e) => update('name', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
-          <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Select category</option>{categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}</select>
+          <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Select brand/category</option>{categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}</select>
           <input required type="number" placeholder="Price" value={form.price} onChange={(e) => update('price', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input type="number" placeholder="Cost price admin only" value={form.costPrice || ''} onChange={(e) => update('costPrice', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input type="number" placeholder="Sale price optional" value={form.salePrice} onChange={(e) => update('salePrice', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input placeholder="Size e.g. 100ml / available sizes" value={form.size || ''} onChange={(e) => update('size', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
           <input type="number" placeholder="Stock" value={form.stock} onChange={(e) => update('stock', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
-          <select value={form.gender || ''} onChange={(e) => update('gender', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Gender</option><option>Female</option><option>Male</option><option>Unisex</option></select>
-          <select value={form.scentFamily || ''} onChange={(e) => update('scentFamily', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Scent family</option><option>Sweet</option><option>Fresh</option><option>Oud</option><option>Floral</option><option>Woody</option><option>Musk</option></select>
-          <input placeholder="Occasion e.g. Office, Gift, Date night" value={form.occasion || ''} onChange={(e) => update('occasion', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
-          <select value={form.brandType || ''} onChange={(e) => update('brandType', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"><option value="">Brand/type</option><option>Designer</option><option>Oil Perfume</option><option>Body Mist</option><option>Home Fragrance</option></select>
           <textarea placeholder="Description" value={form.description} onChange={(e) => update('description', e.target.value)} className="min-h-28 rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
 
           <input placeholder="Notes/tags comma separated e.g. Amber, Vanilla, Gift Ready" value={form.notes} onChange={(e) => update('notes', e.target.value)} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none lg:col-span-2" />
