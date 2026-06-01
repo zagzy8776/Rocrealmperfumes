@@ -21,8 +21,8 @@ const upload = multer({
 const productSchema = z.object({
   name: z.string().min(2),
   description: z.preprocess(
-    (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
-    z.string().min(2).optional().nullable(),
+    (value) => (typeof value === 'string' ? value.trim() : value),
+    z.string().optional().nullable(),
   ),
 
   price: z.coerce.number().positive(),
@@ -39,6 +39,14 @@ const productSchema = z.object({
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
   categoryId: z.string().optional().nullable(),
+});
+
+const normalizeProductData = (data) => ({
+  ...data,
+  description: data.description || '',
+  costPrice: data.costPrice || null,
+  salePrice: data.salePrice || null,
+  categoryId: data.categoryId || null,
 });
 
 router.get('/', asyncHandler(async (req, res) => {
@@ -94,7 +102,7 @@ router.post('/', requireAdmin, asyncHandler(async (req, res) => {
   const slug = existing ? `${baseSlug}-${existing + 1}` : baseSlug;
 
   const product = await prisma.product.create({
-    data: { ...data, description: data.description || null, slug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+    data: { ...normalizeProductData(data), slug },
 
     include: { category: true },
   });
@@ -112,7 +120,7 @@ router.put('/:id', requireAdmin, asyncHandler(async (req, res) => {
   const nextSlug = current.name === data.name ? current.slug : (conflicting ? `${baseSlug}-${conflicting + 1}` : baseSlug);
   const product = await prisma.product.update({
     where: { id: req.params.id },
-    data: { ...data, description: data.description || null, slug: nextSlug, costPrice: data.costPrice || null, salePrice: data.salePrice || null, categoryId: data.categoryId || null },
+    data: { ...normalizeProductData(data), slug: nextSlug },
 
     include: { category: true },
   });
