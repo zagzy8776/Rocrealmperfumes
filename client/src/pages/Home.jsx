@@ -11,13 +11,32 @@ const HOME_PRODUCTS_PER_BATCH = 10;
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(HOME_PRODUCTS_PER_BATCH);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, hasMore: false });
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     setPageMeta({ title: 'Roc Realm Perfumes', description: 'Shop perfumes, oils, body mists, diffusers, humidifiers, and gift items from Roc Realm Perfumes.' });
-    api.get('/products').then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
+    api.get(`/products?page=1&limit=${HOME_PRODUCTS_PER_BATCH}`).then((res) => {
+      setProducts(res.data.products);
+      setPagination(res.data.pagination || { total: res.data.products.length, hasMore: false });
+    }).catch(() => { setProducts([]); setPagination({ total: 0, hasMore: false }); });
     api.get('/categories').then((res) => setCategories(res.data.categories)).catch(() => setCategories([]));
   }, []);
+
+  const loadMoreProducts = async () => {
+    if (loadingMore || !pagination.hasMore) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const res = await api.get(`/products?page=${nextPage}&limit=${HOME_PRODUCTS_PER_BATCH}`);
+      setProducts((current) => [...current, ...res.data.products]);
+      setPagination(res.data.pagination || { total: products.length + res.data.products.length, hasMore: false });
+      setPage(nextPage);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <main>
@@ -53,14 +72,14 @@ export default function Home() {
           <Link to="/shop" className="font-semibold text-amber-800">View all products</Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-          {products.slice(0, visibleCount).map((product) => <ProductCard key={product.id} product={product} />)}
+          {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
-        {visibleCount < products.length && (
+        {pagination.hasMore && (
           <div className="mt-10 text-center">
-            <button onClick={() => setVisibleCount((count) => count + HOME_PRODUCTS_PER_BATCH)} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700">
-              View more products
+            <button disabled={loadingMore} onClick={loadMoreProducts} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60">
+              {loadingMore ? 'Loading...' : 'View more products'}
             </button>
-            <p className="mt-3 text-sm text-stone-500">Showing {Math.min(visibleCount, products.length)} of {products.length}</p>
+            <p className="mt-3 text-sm text-stone-500">Showing {products.length} of {pagination.total}</p>
           </div>
         )}
         {!products.length && <p className="rounded-[2rem] bg-white p-10 text-center text-stone-500">No products yet. Add products from the admin panel.</p>}

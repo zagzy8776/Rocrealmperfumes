@@ -16,7 +16,7 @@ export default function ProductCard({ product }) {
     <article className="group overflow-hidden rounded-[1.2rem] border border-amber-900/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl sm:rounded-[1.5rem]">
       <div className="relative">
         <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
-        <img src={image} alt={product.name} className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
+        <img src={image} alt={product.name} loading="lazy" decoding="async" className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
         </Link>
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           {product.salePrice && <span className="rounded-full bg-red-600 px-2 py-1 text-[10px] font-bold text-white">SALE</span>}

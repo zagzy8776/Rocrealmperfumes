@@ -50,25 +50,43 @@ const normalizeProductData = (data) => ({
 });
 
 router.get('/', asyncHandler(async (req, res) => {
-  const { search, category, featured, active } = req.query;
+  const { search, category, featured, active, page, limit } = req.query;
+  const pageNumber = Math.max(1, Number(page || 1));
+  const pageSize = Math.min(48, Math.max(1, Number(limit || 24)));
+  const skip = (pageNumber - 1) * pageSize;
 
+  const where = {
+    isActive: active === 'false' ? undefined : true,
+    isFeatured: featured === 'true' ? true : undefined,
 
-  const products = await prisma.product.findMany({
-    where: {
-      isActive: active === 'false' ? undefined : true,
-      isFeatured: featured === 'true' ? true : undefined,
+    category: category ? { slug: String(category) } : undefined,
+    OR: search ? [
+      { name: { contains: String(search), mode: 'insensitive' } },
+      { description: { contains: String(search), mode: 'insensitive' } },
+    ] : undefined,
+  };
 
-      category: category ? { slug: String(category) } : undefined,
-      OR: search ? [
-        { name: { contains: String(search), mode: 'insensitive' } },
-        { description: { contains: String(search), mode: 'insensitive' } },
-      ] : undefined,
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      skip,
+      take: pageSize,
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  res.json({
+    products: products.map(formatProduct),
+    pagination: {
+      page: pageNumber,
+      limit: pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+      hasMore: pageNumber * pageSize < total,
     },
-    include: { category: true },
-    orderBy: { createdAt: 'desc' },
   });
-
-  res.json({ products: products.map(formatProduct) });
 }));
 
 router.get('/admin/all', requireAdmin, asyncHandler(async (req, res) => {

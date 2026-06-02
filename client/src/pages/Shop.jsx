@@ -13,7 +13,9 @@ export default function Shop() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('new');
   const [availability, setAvailability] = useState('all');
-  const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_BATCH);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, hasMore: false });
+  const [loadingMore, setLoadingMore] = useState(false);
 
 
   useEffect(() => {
@@ -25,14 +27,34 @@ export default function Shop() {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (search) params.set('search', search);
+    params.set('page', '1');
+    params.set('limit', String(PRODUCTS_PER_BATCH));
 
-    setVisibleCount(PRODUCTS_PER_BATCH);
-    api.get(`/products?${params.toString()}`).then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
+    setPage(1);
+    api.get(`/products?${params.toString()}`).then((res) => {
+      setProducts(res.data.products);
+      setPagination(res.data.pagination || { total: res.data.products.length, hasMore: false });
+    }).catch(() => { setProducts([]); setPagination({ total: 0, hasMore: false }); });
   }, [category, search]);
 
-  useEffect(() => {
-    setVisibleCount(PRODUCTS_PER_BATCH);
-  }, [sort, availability]);
+  const loadMoreProducts = async () => {
+    if (loadingMore || !pagination.hasMore) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const params = new URLSearchParams();
+      if (category) params.set('category', category);
+      if (search) params.set('search', search);
+      params.set('page', String(nextPage));
+      params.set('limit', String(PRODUCTS_PER_BATCH));
+      const res = await api.get(`/products?${params.toString()}`);
+      setProducts((current) => [...current, ...res.data.products]);
+      setPagination(res.data.pagination || { total: products.length + res.data.products.length, hasMore: false });
+      setPage(nextPage);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
 
   const sorted = useMemo(() => products.filter((product) => availability === 'all' ? true : product.stock > 0).sort((a, b) => {
@@ -42,9 +64,6 @@ export default function Shop() {
     if (sort === 'high') return bp - ap;
     return 0;
   }), [products, sort, availability]);
-
-  const visibleProducts = sorted.slice(0, visibleCount);
-  const hasMoreProducts = visibleCount < sorted.length;
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -79,14 +98,14 @@ export default function Shop() {
 
 
       <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {visibleProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+        {sorted.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
-      {hasMoreProducts && (
+      {pagination.hasMore && (
         <div className="mt-10 text-center">
-          <button onClick={() => setVisibleCount((count) => count + PRODUCTS_PER_BATCH)} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700">
-            View more products
+          <button disabled={loadingMore} onClick={loadMoreProducts} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60">
+            {loadingMore ? 'Loading...' : 'View more products'}
           </button>
-          <p className="mt-3 text-sm text-stone-500">Showing {visibleProducts.length} of {sorted.length}</p>
+          <p className="mt-3 text-sm text-stone-500">Showing {products.length} of {pagination.total}</p>
         </div>
       )}
       {!sorted.length && <p className="py-20 text-center text-stone-500">No products found.</p>}
