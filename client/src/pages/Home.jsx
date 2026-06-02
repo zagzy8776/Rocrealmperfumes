@@ -50,8 +50,8 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="mb-4 inline-flex rounded-full border border-amber-300/30 px-4 py-2 text-sm text-amber-200">Roc Realm Perfumes</p>
-            <h1 className="font-display text-4xl font-semibold leading-tight sm:text-6xl">Discover scents made for every mood.</h1>
-            <p className="mt-4 max-w-xl text-base text-stone-200 sm:text-lg">Shop perfumes, oils, mists, diffusers, and gift picks in one place.</p>
+            <h1 className="font-display text-4xl font-semibold leading-tight sm:text-6xl">Discover your signature scent and experience luxury that lingers.</h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-stone-200 sm:text-lg">Roc Realm Perfumes offers original designer perfumes, Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, and premium scents carefully curated for everyday living.</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-6 py-3 font-semibold text-stone-950 hover:bg-amber-300">Shop now <ArrowRight size={18} /></Link>
               <Link to="/contact" className="rounded-full border border-white/20 px-6 py-3 font-semibold text-white hover:bg-white/10">WhatsApp us</Link>
