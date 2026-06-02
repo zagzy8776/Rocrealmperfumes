@@ -15,7 +15,7 @@ export default function ProductCard({ product }) {
   return (
     <article className="group overflow-hidden rounded-[1.2rem] border border-amber-900/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl sm:rounded-[1.5rem]">
       <div className="relative">
-        <Link to={`/product/${product.slug}`} className="block aspect-square overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1.5">
+        <Link to={`/product/${product.slug}`} className="block h-44 overflow-hidden bg-gradient-to-br from-amber-50 to-stone-100 p-1 sm:h-56 lg:h-60">
         <img src={image} alt={product.name} loading="lazy" decoding="async" className="h-full w-full object-contain transition duration-700 group-hover:scale-105" />
         </Link>
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
