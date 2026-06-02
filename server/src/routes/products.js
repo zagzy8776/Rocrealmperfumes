@@ -50,7 +50,7 @@ const normalizeProductData = (data) => ({
 });
 
 router.get('/', asyncHandler(async (req, res) => {
-  const { search, category, featured, active, page, limit } = req.query;
+  const { search, category, featured, active, page, limit, availability, sort } = req.query;
   const pageNumber = Math.max(1, Number(page || 1));
   const pageSize = Math.min(48, Math.max(1, Number(limit || 24)));
   const skip = (pageNumber - 1) * pageSize;
@@ -60,11 +60,18 @@ router.get('/', asyncHandler(async (req, res) => {
     isFeatured: featured === 'true' ? true : undefined,
 
     category: category ? { slug: String(category) } : undefined,
+    stock: availability === 'available' ? { gt: 0 } : undefined,
     OR: search ? [
       { name: { contains: String(search), mode: 'insensitive' } },
       { description: { contains: String(search), mode: 'insensitive' } },
     ] : undefined,
   };
+
+  const orderBy = sort === 'low'
+    ? { price: 'asc' }
+    : sort === 'high'
+      ? { price: 'desc' }
+      : { createdAt: 'desc' };
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({
@@ -72,7 +79,7 @@ router.get('/', asyncHandler(async (req, res) => {
       skip,
       take: pageSize,
       include: { category: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy,
     }),
     prisma.product.count({ where }),
   ]);

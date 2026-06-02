@@ -14,8 +14,8 @@ export default function Shop() {
   const [sort, setSort] = useState('new');
   const [availability, setAvailability] = useState('all');
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ total: 0, hasMore: false });
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasMore: false });
+  const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -23,47 +23,38 @@ export default function Shop() {
     api.get('/categories').then((res) => setCategories(res.data.categories)).catch(() => setCategories([]));
   }, []);
 
-  useEffect(() => {
+  const fetchProducts = async (targetPage = 1) => {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (search) params.set('search', search);
-    params.set('page', '1');
+    if (availability !== 'all') params.set('availability', availability);
+    if (sort !== 'new') params.set('sort', sort);
+    params.set('page', String(targetPage));
     params.set('limit', String(PRODUCTS_PER_BATCH));
 
-    setPage(1);
-    api.get(`/products?${params.toString()}`).then((res) => {
-      setProducts(res.data.products);
-      setPagination(res.data.pagination || { total: res.data.products.length, hasMore: false });
-    }).catch(() => { setProducts([]); setPagination({ total: 0, hasMore: false }); });
-  }, [category, search]);
-
-  const loadMoreProducts = async () => {
-    if (loadingMore || !pagination.hasMore) return;
-    setLoadingMore(true);
+    setLoading(true);
     try {
-      const nextPage = page + 1;
-      const params = new URLSearchParams();
-      if (category) params.set('category', category);
-      if (search) params.set('search', search);
-      params.set('page', String(nextPage));
-      params.set('limit', String(PRODUCTS_PER_BATCH));
       const res = await api.get(`/products?${params.toString()}`);
-      setProducts((current) => [...current, ...res.data.products]);
-      setPagination(res.data.pagination || { total: products.length + res.data.products.length, hasMore: false });
-      setPage(nextPage);
+      setProducts(res.data.products);
+      setPagination(res.data.pagination || { total: res.data.products.length, totalPages: 1, hasMore: false });
+      setPage(targetPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      setProducts([]);
+      setPagination({ total: 0, totalPages: 1, hasMore: false });
     } finally {
-      setLoadingMore(false);
+      setLoading(false);
     }
   };
 
+  useEffect(() => { fetchProducts(1); }, [category, search, sort, availability]);
 
-  const sorted = useMemo(() => products.filter((product) => availability === 'all' ? true : product.stock > 0).sort((a, b) => {
-    const ap = Number(a.salePrice || a.price);
-    const bp = Number(b.salePrice || b.price);
-    if (sort === 'low') return ap - bp;
-    if (sort === 'high') return bp - ap;
-    return 0;
-  }), [products, sort, availability]);
+  const pageNumbers = useMemo(() => {
+    const totalPages = Math.max(1, pagination.totalPages || 1);
+    const start = Math.max(1, page - 2);
+    const end = Math.min(totalPages, start + 4);
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [page, pagination.totalPages]);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -98,17 +89,26 @@ export default function Shop() {
 
 
       <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {sorted.map((product) => <ProductCard key={product.id} product={product} />)}
+        {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
-      {pagination.hasMore && (
-        <div className="mt-10 text-center">
-          <button disabled={loadingMore} onClick={loadMoreProducts} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60">
-            {loadingMore ? 'Loading...' : 'View more products'}
+      {loading && <p className="py-8 text-center text-stone-500">Loading products...</p>}
+      {pagination.totalPages > 1 && (
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+          <button disabled={loading || page <= 1} onClick={() => fetchProducts(page - 1)} className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-800 shadow-sm ring-1 ring-amber-900/10 disabled:cursor-not-allowed disabled:opacity-40">
+            Previous
           </button>
-          <p className="mt-3 text-sm text-stone-500">Showing {products.length} of {pagination.total}</p>
+          {pageNumbers.map((pageNumber) => (
+            <button key={pageNumber} disabled={loading} onClick={() => fetchProducts(pageNumber)} className={`h-11 w-11 rounded-full text-sm font-bold shadow-sm ${pageNumber === page ? 'bg-stone-950 text-white' : 'bg-white text-stone-800 ring-1 ring-amber-900/10'}`}>
+              {pageNumber}
+            </button>
+          ))}
+          <button disabled={loading || page >= pagination.totalPages} onClick={() => fetchProducts(page + 1)} className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-800 shadow-sm ring-1 ring-amber-900/10 disabled:cursor-not-allowed disabled:opacity-40">
+            Next
+          </button>
+          <p className="w-full text-center text-sm text-stone-500">Page {page} of {pagination.totalPages} · {pagination.total} products</p>
         </div>
       )}
-      {!sorted.length && <p className="py-20 text-center text-stone-500">No products found.</p>}
+      {!products.length && !loading && <p className="py-20 text-center text-stone-500">No products found.</p>}
     </main>
   );
 }
