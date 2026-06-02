@@ -6,9 +6,12 @@ import { api } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
+const HOME_PRODUCTS_PER_BATCH = 10;
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(HOME_PRODUCTS_PER_BATCH);
 
   useEffect(() => {
     setPageMeta({ title: 'Roc Realm Perfumes', description: 'Shop perfumes, oils, body mists, diffusers, humidifiers, and gift items from Roc Realm Perfumes.' });
@@ -50,8 +53,16 @@ export default function Home() {
           <Link to="/shop" className="font-semibold text-amber-800">View all products</Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-          {products.slice(0, 20).map((product) => <ProductCard key={product.id} product={product} />)}
+          {products.slice(0, visibleCount).map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
+        {visibleCount < products.length && (
+          <div className="mt-10 text-center">
+            <button onClick={() => setVisibleCount((count) => count + HOME_PRODUCTS_PER_BATCH)} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700">
+              View more products
+            </button>
+            <p className="mt-3 text-sm text-stone-500">Showing {Math.min(visibleCount, products.length)} of {products.length}</p>
+          </div>
+        )}
         {!products.length && <p className="rounded-[2rem] bg-white p-10 text-center text-stone-500">No products yet. Add products from the admin panel.</p>}
       </section>
     </main>

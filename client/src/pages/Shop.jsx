@@ -4,6 +4,8 @@ import { api } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
+const PRODUCTS_PER_BATCH = 18;
+
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -11,6 +13,7 @@ export default function Shop() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('new');
   const [availability, setAvailability] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_BATCH);
 
 
   useEffect(() => {
@@ -23,8 +26,13 @@ export default function Shop() {
     if (category) params.set('category', category);
     if (search) params.set('search', search);
 
+    setVisibleCount(PRODUCTS_PER_BATCH);
     api.get(`/products?${params.toString()}`).then((res) => setProducts(res.data.products)).catch(() => setProducts([]));
   }, [category, search]);
+
+  useEffect(() => {
+    setVisibleCount(PRODUCTS_PER_BATCH);
+  }, [sort, availability]);
 
 
   const sorted = useMemo(() => products.filter((product) => availability === 'all' ? true : product.stock > 0).sort((a, b) => {
@@ -34,6 +42,9 @@ export default function Shop() {
     if (sort === 'high') return bp - ap;
     return 0;
   }), [products, sort, availability]);
+
+  const visibleProducts = sorted.slice(0, visibleCount);
+  const hasMoreProducts = visibleCount < sorted.length;
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -68,8 +79,16 @@ export default function Shop() {
 
 
       <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {sorted.map((product) => <ProductCard key={product.id} product={product} />)}
+        {visibleProducts.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
+      {hasMoreProducts && (
+        <div className="mt-10 text-center">
+          <button onClick={() => setVisibleCount((count) => count + PRODUCTS_PER_BATCH)} className="rounded-full bg-stone-950 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-amber-700">
+            View more products
+          </button>
+          <p className="mt-3 text-sm text-stone-500">Showing {visibleProducts.length} of {sorted.length}</p>
+        </div>
+      )}
       {!sorted.length && <p className="py-20 text-center text-stone-500">No products found.</p>}
     </main>
   );
