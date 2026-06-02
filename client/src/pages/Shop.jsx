@@ -4,7 +4,7 @@ import { api } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
-const PRODUCTS_PER_BATCH = 18;
+const PRODUCTS_PER_BATCH = 12;
 
 export default function Shop() {
   const [products, setProducts] = useState([]);

@@ -6,7 +6,7 @@ import { api } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
-const HOME_PRODUCTS_PER_BATCH = 10;
+const HOME_PRODUCTS_PER_BATCH = 12;
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -77,7 +77,7 @@ export default function Home() {
           </div>
           <Link to="/shop" className="font-semibold text-amber-800">View all products</Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5 xl:grid-cols-6">
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
         {loading && <p className="py-8 text-center text-stone-500">Loading products...</p>}
