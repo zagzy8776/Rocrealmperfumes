@@ -88,7 +88,7 @@ export default function Shop() {
       </div>
 
 
-      <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
         {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
       {loading && <p className="py-8 text-center text-stone-500">Loading products...</p>}
