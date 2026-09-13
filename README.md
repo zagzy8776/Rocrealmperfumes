@@ -1,31 +1,16 @@
 # Roc Realm Perfumes
 
-A luxury full-stack online store for Roc Realm Nigeria Limited: original designer Arabian fragrances, oil perfumes, body mists, sprays, diffusers, humidifiers, gift sets, and home scents.
+Luxury full-stack ecommerce store for Roc Realm Nigeria Limited: designer and Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and home scents.
 
 ## Stack
 
-- Frontend: React + Vite + Tailwind CSS, deployable on Vercel
-- Backend: Express + Prisma, deployable on Render
-- Database: PostgreSQL on Neon
-- Payment: Paystack intentionally left for later
-- Current checkout: order saved to database and sent to WhatsApp
+- Frontend: React + Vite + Tailwind CSS
+- Backend: Express + Prisma
+- Database: PostgreSQL
+- Checkout: database order + WhatsApp confirmation
+- Images: Cloudinary
 
-## Features
-
-- Luxury homepage
-- Shop/catalog page
-- Product detail page
-- Cart
-- Checkout
-- WhatsApp order message
-- Admin login
-- Admin dashboard stats
-- Product management
-- Category management
-- Coupon management
-- Order management and status updates
-
-## Local Setup
+## Local setup
 
 ### Backend
 
@@ -39,7 +24,18 @@ npm run db:seed
 npm run dev
 ```
 
-Set `DATABASE_URL` in `server/.env` using your Neon PostgreSQL connection string.
+Required production secrets:
+
+- `DATABASE_URL`
+- `DATABASE_URL_UNPOOLED` when Prisma schema pushes require it
+- `JWT_SECRET` (at least 32 random characters)
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD` (at least 12 strong characters)
+- `ADMIN_NAME`
+- `CLIENT_URL`
+- `NODE_ENV=production`
+
+**The seed process intentionally refuses to create a default admin password.** Never commit real `.env` files or credentials.
 
 ### Frontend
 
@@ -50,81 +46,32 @@ npm install --include=dev
 npm run dev
 ```
 
-Update `VITE_WHATSAPP_NUMBER` with Roc Realm Perfume's WhatsApp number in international format. Current number: `2349084782126`.
+Recommended variables:
 
-## Default Seed Admin
+- `VITE_API_URL=https://your-api-domain.example/api`
+- `VITE_SITE_URL=https://your-store-domain.example`
+- `VITE_WHATSAPP_NUMBER=2349084782126`
+- `VITE_BANK_NAME`
+- `VITE_BANK_ACCOUNT_NUMBER`
+- `VITE_BANK_ACCOUNT_NAME`
 
-- Email: `admin@rocrealmperfume.com` by default, or set `ADMIN_EMAIL=rocrealmnigerialimited@gmail.com`
-- Password: `ChangeMe123!`
+## Production
 
-Change these in `server/.env` before deployment.
+The client build generates a sitemap from the live product API and generates `robots.txt` from `VITE_SITE_URL`. Set `VITE_SITE_URL` and `VITE_API_URL` before running `npm run build`.
 
-## Deployment
+The admin session uses an HttpOnly cookie. Configure frontend/backend origins correctly so credentialed requests are accepted.
 
-## Production Checklist
+Inventory is not permanently deducted when an unpaid order is created. Stock is deducted atomically when an order enters fulfillment, and the backend checks payment status for prepaid methods.
 
-- Create Neon PostgreSQL database.
-- Add Render backend environment variables.
-- Deploy backend on Render.
-- Run `npx prisma db push` and `npm run db:seed` on Render.
-- Add Vercel frontend environment variables.
-- Deploy frontend on Vercel.
-- Update Render `CLIENT_URL` to your final Vercel domain.
-- Test shop, product details, cart, checkout, WhatsApp redirect, and admin login.
-
-### Neon
-
-Create a Neon PostgreSQL database and copy the connection string into Render as `DATABASE_URL`.
-
-### Render Backend
-
-Deploy the `server` folder.
-
-Recommended settings:
-
-- Root Directory: `server`
-- Build Command: `npm install --include=dev && npm run deploy:setup`
-- Start Command: `npm start`
-
-Environment variables:
-
-- `DATABASE_URL`
-- `DATABASE_URL_UNPOOLED` for Neon direct connection used by Prisma schema pushes
-- `JWT_SECRET`
-- `CLIENT_URL` e.g. `https://your-vercel-domain.vercel.app`
-- `NODE_ENV=production`
-- `ADMIN_NAME=Roc Realm Admin`
-- `ADMIN_EMAIL=rocrealmnigerialimited@gmail.com`
-- `ADMIN_PASSWORD=choose-a-strong-password`
-
-The recommended build command runs Prisma setup automatically. If you need to run it manually, use:
+## Quality checks
 
 ```bash
-npx prisma db push
-npm run db:seed
+cd client
+npm test
+npm run build
 ```
 
-### Vercel Frontend
-
-Deploy the `client` folder.
-
-If Vercel imports the repository root, the root `vercel.json` will build `client` and output `client/dist` automatically. If you configure manually, use the settings below.
-
-Recommended settings:
-
-- Root Directory: `client`
-- Build Command: `npm install --include=dev && npm run build`
-- Output Directory: `dist`
-
-Environment variables:
-
-- `VITE_API_URL=https://your-render-api.onrender.com/api`
-- `VITE_WHATSAPP_NUMBER=2349084782126`
-
-Public call line displayed on the website: `08085100229`.
-
-If you accidentally set `VITE_API_URL` to the Render root URL without `/api`, the frontend normalizes it automatically, but using `/api` in Vercel is still recommended.
-
-## Important
-
-Do not commit real `.env` files. Only `.env.example` should be on GitHub.
+```bash
+cd server
+npm test
+```
