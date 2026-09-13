@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order-success
+Disallow: /wishlist
+Disallow: /api/
 
-Sitemap: /sitemap.xml
+Sitemap: https://rocrealmperfumes.com/sitemap.xml
