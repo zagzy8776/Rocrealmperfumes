@@ -1,14 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { trackPageView } from '../lib/analytics.js';
-
-export default function RouteTracker() {
-  const location = useLocation();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => trackPageView(), 250);
-    return () => window.clearTimeout(timer);
-  }, [location.pathname, location.search]);
-
-  return null;
-}
+import { setOrganizationStructuredData, setPageMeta, setProductStructuredData } from '../lib/seo.js';
+import { api } from '../lib/api.js';
+export default function RouteTracker(){const location=useLocation();useEffect(()=>{setOrganizationStructuredData();const timer=window.setTimeout(()=>trackPageView(),250);return()=>window.clearTimeout(timer)},[location.pathname,location.search]);useEffect(()=>{const match=location.pathname.match(/^\/product\/([^/]+)/);if(!match)return;let active=true;api.get(`/products/${match[1]}`).then(res=>{if(!active)return;const p=res.data.product;setPageMeta({title:p.name,description:p.description||`Buy ${p.name} from Roc Realm Perfumes in Owerri, Nigeria.`,image:p.images?.[0],url:window.location.href,type:'product'});setProductStructuredData(p)}).catch(()=>{});return()=>{active=false}},[location.pathname]);return null;}
