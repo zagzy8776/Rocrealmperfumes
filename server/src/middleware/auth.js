@@ -2,25 +2,27 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../lib/prisma');
 const asyncHandler = require('../utils/asyncHandler');
 
+const getCookie = (req, name) => {
+  const header = req.headers.cookie || '';
+  const pair = header.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
+  return pair ? decodeURIComponent(pair.slice(name.length + 1)) : null;
+};
+
 const requireAdmin = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const token = bearer || getCookie(req, 'rrp_admin_token');
 
-  if (!token) {
-    return res.status(401).json({ message: 'Authentication required.' });
-  }
+  if (!token) return res.status(401).json({ message: 'Authentication required.' });
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) return res.status(500).json({ message: 'Authentication is not configured securely.' });
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const admin = await prisma.admin.findUnique({ where: { id: payload.id } });
-
-    if (!admin) {
-      return res.status(401).json({ message: 'Admin account not found.' });
-    }
-
+    if (!admin) return res.status(401).json({ message: 'Admin account not found.' });
     req.admin = { id: admin.id, name: admin.name, email: admin.email, role: admin.role };
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ message: 'Invalid or expired token.' });
   }
 });
