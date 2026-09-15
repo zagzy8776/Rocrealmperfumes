@@ -78,7 +78,26 @@ Because the generated artifact is what crawlers see, **the build must know the p
 | Variable | Why it matters |
 | --- | --- |
 | `VITE_SITE_URL` | Used for every canonical URL, `og:url`, `og:image` and every sitemap entry. |
-| `VITE_API_URL` | Needed at build time to pre-render product pages and list products in the sitemap. |
+| `VITE_API_URL` | Needed at build time to pre-render product pages and list products in the sitemap. In production the default is `/api` (same origin: the Express API runs as a Vercel serverless function). Set an absolute URL only when the backend is hosted elsewhere. |
+
+### One Vercel project, frontend + backend
+
+The same Vercel project serves the static frontend **and** the Express API as a serverless
+function (`api/index.js` mounts `server/src/index.js`; it skips `app.listen()` when `VERCEL`
+is set). Requests to `/api/*` are rewritten to the function, everything else falls through to
+the SPA. The backend needs these environment variables on Vercel (they are **not** read from
+`client/.env.production`):
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string (use the **pooled** one, e.g. Neon's `-pooler` host). |
+| `JWT_SECRET` | 32+ characters; signs admin sessions. |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Product/gallery image uploads. |
+| `CLIENT_URL` | Comma-separated allowed origins, e.g. `https://rocrealmperfumes.vercel.app` (add the custom domain later). |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` | Only needed once to seed the admin account. |
+
+Database schema and the admin seed are run **once** from a machine with the production
+`DATABASE_URL`: `cd server && npx prisma db push && node prisma/seed.js`.
 
 When `VITE_SITE_URL` is missing (or still `http://localhost:5173`) in a Vercel build, the build
 **stops with an error** instead of publishing localhost canonicals. Set it under

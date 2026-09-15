@@ -78,5 +78,14 @@ export function resolveSiteUrl() {
 }
 
 export function resolveApiUrl() {
-  return stripTrailingSlash(process.env.VITE_API_URL || LOCAL_API_URL);
+  const raw = stripTrailingSlash(
+    // RRP_BUILD_API_URL is set by scripts/vercel-build.sh, which boots the API
+    // locally on the build machine so product pages can be prerendered. The
+    // browser-facing value (/api, same origin) must never leak into the build.
+    process.env.RRP_BUILD_API_URL || process.env.VITE_API_URL || LOCAL_API_URL,
+  );
+  // A relative API base ("same-origin", e.g. VITE_API_URL="/api") is what the
+  // browser wants, but the build-time fetchers need an absolute URL.
+  if (raw.startsWith('/')) return `${resolveSiteUrl()}${raw}`;
+  return raw;
 }

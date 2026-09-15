@@ -89,4 +89,11 @@ app.use((error, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong.' });
 });
 
-app.listen(port, () => console.log(`Roc Realm Perfume API running on port ${port}`));
+// On Vercel the Express app is mounted as a serverless function (see /api/index.js),
+// so it must be exported instead of listening on a port. Everywhere else (Render,
+// local dev) it starts an HTTP server as before.
+if (!process.env.VERCEL) {
+  app.listen(port, () => console.log(`Roc Realm Perfume API running on port ${port}`));
+}
+
+module.exports = app;
