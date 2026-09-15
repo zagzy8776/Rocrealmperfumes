@@ -1,5 +1,39 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 const LOCAL_SITE_URL = 'http://localhost:5173';
 const LOCAL_API_URL = 'http://localhost:5000/api';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const clientRoot = path.resolve(here, '..');
+
+/**
+ * Loads KEY=VALUE pairs from an env file into process.env WITHOUT overriding
+ * variables that are already set - mirroring Vite's priority, where real
+ * environment variables always win over .env files. Files are loaded in
+ * Vite's precedence order (lowest first): .env, .env.local, .env.production.
+ */
+function loadEnvFile(name) {
+  const file = path.join(clientRoot, name);
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const match = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/.exec(line);
+    if (!match) continue;
+    let value = match[2].trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[match[1]] === undefined) process.env[match[1]] = value;
+  }
+}
+
+loadEnvFile('.env');
+loadEnvFile('.env.local');
+loadEnvFile('.env.production');
 
 const stripTrailingSlash = (value) => String(value || '').trim().replace(/\/+$/, '');
 
