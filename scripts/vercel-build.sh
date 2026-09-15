@@ -6,7 +6,7 @@ set -e
 cd "$(dirname "$0")/../server"
 npx prisma generate
 
-PORT=5001 node src/index.js &
+PORT=5001 RRP_FORCE_LISTEN=1 node src/index.js &
 SERVER_PID=$!
 cleanup() { kill "$SERVER_PID" 2>/dev/null || true; }
 trap cleanup EXIT

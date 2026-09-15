@@ -91,8 +91,8 @@ app.use((error, req, res, next) => {
 
 // On Vercel the Express app is mounted as a serverless function (see /api/index.js),
 // so it must be exported instead of listening on a port. Everywhere else (Render,
-// local dev) it starts an HTTP server as before.
-if (!process.env.VERCEL) {
+// local dev, or the build machine via RRP_FORCE_LISTEN) it starts an HTTP server.
+if (!process.env.VERCEL || process.env.RRP_FORCE_LISTEN) {
   app.listen(port, () => console.log(`Roc Realm Perfume API running on port ${port}`));
 }
 
