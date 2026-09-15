@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, MessageCircle, Phone, Search } from 'lucide-react';
+import { AlertCircle, Download, MessageCircle, Phone, Search } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
 const statuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'DELIVERED', 'CANCELLED'];
@@ -40,6 +40,32 @@ export default function AdminOrders() {
     load();
   };
 
+  const exportToCSV = () => {
+    const headers = ['Order Number', 'Customer Name', 'Phone', 'Email', 'Address', 'City', 'Total', 'Status', 'Payment Status', 'Payment Method', 'Delivery Method', 'Created At'];
+    const rows = filteredOrders.map((order) => [
+      order.orderNumber,
+      order.customerName,
+      order.customerPhone,
+      order.customerEmail || 'N/A',
+      order.deliveryAddress,
+      order.deliveryCity,
+      order.total,
+      order.status,
+      order.paymentStatus || 'UNPAID',
+      order.paymentMethod,
+      order.deliveryMethod,
+      new Date(order.createdAt).toLocaleString(),
+    ]);
+    const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'orders.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <section className="p-6 lg:p-10">
       <div>
@@ -50,7 +76,7 @@ export default function AdminOrders() {
 
       {error && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-red-700"><AlertCircle size={18} /> {error}</div>}
 
-      <div className="mt-8 grid gap-4 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm md:grid-cols-[1fr_220px]">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm md:grid-cols-[1fr_220px_auto]">
         <label className="flex items-center gap-3 rounded-full bg-stone-100 px-4">
           <Search size={18} className="text-stone-500" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search order number, name, phone..." className="w-full bg-transparent py-3 outline-none" />
@@ -59,6 +85,7 @@ export default function AdminOrders() {
           <option value="ALL">All statuses</option>
           {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
         </select>
+        <button onClick={exportToCSV} className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-3 text-sm font-semibold text-stone-800 hover:bg-stone-200"><Download size={15} /> Export CSV</button>
       </div>
 
       <div className="mt-8 grid gap-5">

@@ -4,14 +4,19 @@ import { Heart, MessageCircle, ShoppingBag } from 'lucide-react';
 import { api, formatNaira, whatsappNumber } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
-import { setPageMeta } from '../lib/seo.js';
+import { useRecentlyViewed } from '../context/RecentlyViewedContext.jsx';
+import { setPageMeta, setProductStructuredData } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
+import ProductReviews from '../components/ProductReviews.jsx';
 
 export default function ProductDetails() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [activeImage, setActiveImage] = useState('');
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [alertPhone, setAlertPhone] = useState('');
@@ -19,16 +24,30 @@ export default function ProductDetails() {
   const [alertMessage, setAlertMessage] = useState('');
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { addToRecentlyViewed, recentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     setLoading(true);
+    let loaded = null;
     api.get(`/products/${slug}`).then((res) => {
-      setProduct(res.data.product);
-      setActiveImage(res.data.product.images?.[0] || '');
-      setPageMeta({ title: res.data.product.name, description: res.data.product.description, image: res.data.product.images?.[0] });
-      return api.get(`/products?category=${res.data.product.category?.slug || ''}`);
-    }).then((res) => setRelated(res.data.products.filter((item) => item.slug !== slug).slice(0, 5))).catch(() => setProduct(null)).finally(() => setLoading(false));
-  }, [slug]);
+      const productData = res.data.product;
+      loaded = productData;
+      setProduct(productData);
+      setActiveImage(productData.images?.[0] || '');
+      setPageMeta({ 
+        title: `${productData.name} | Original Perfume Owerri`,
+        description: `${productData.name} - Original designer fragrance from Roc Realm Perfumes, #1 perfume store in Owerri, Imo State. ${productData.description || 'Shop trending Arabian and designer perfumes.'} Delivery to Port Harcourt, Onitsha, Anambra, Enugu.`,
+        image: productData.images?.[0] 
+      });
+      addToRecentlyViewed(productData);
+      return api.get(`/reviews/product/${productData.id}`).catch(() => ({ data: { reviews: [] } }));
+    }).then((res) => {
+      const reviewsData = res.data.reviews || [];
+      setReviews(reviewsData);
+      setProductStructuredData(loaded, reviewsData);
+      return api.get(`/products?category=${product.category?.slug || ''}`);
+    }).then((res) => setRelated(res.data.products.filter((item) => item.slug !== slug).slice(0, 5))).catch(() => {}).finally(() => setLoading(false));
+  }, [slug, addToRecentlyViewed]);
 
   if (loading) return <main className="mx-auto max-w-7xl px-4 py-20 text-center">Loading product...</main>;
   if (!product) return <main className="mx-auto max-w-7xl px-4 py-20 text-center"><h1 className="font-display text-4xl">Product not found</h1><Link to="/shop" className="mt-5 inline-block rounded-full bg-stone-950 px-6 py-3 text-white">Back to shop</Link></main>;
@@ -38,6 +57,20 @@ export default function ProductDetails() {
   const outOfStock = product.stock <= 0;
 
   const wished = isWishlisted(product.id);
+  
+  const handleMouseMove = (e) => {
+    if (!isZoomed) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition({ x, y });
+  };
+
+  const toggleZoom = () => {
+    setIsZoomed(!isZoomed);
+    if (!isZoomed) setZoomPosition({ x: 50, y: 50 });
+  };
+
   const submitStockAlert = async (e) => {
     e.preventDefault();
     setAlertMessage('');
@@ -52,11 +85,29 @@ export default function ProductDetails() {
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <div className="grid gap-10 lg:grid-cols-2">
       <div>
-        <div className="overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm">
-          <img src={activeImage || product.images?.[0]} alt={product.name} className="h-[32rem] w-full object-contain" />
-
+        <div 
+          className={`overflow-hidden rounded-[3rem] bg-gradient-to-br from-amber-50 to-stone-100 p-4 shadow-sm cursor-zoom-in ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+          onClick={toggleZoom}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setIsZoomed(false)}
+        >
+          <div className="relative h-[32rem] overflow-hidden">
+            <img 
+              src={activeImage || product.images?.[0]} 
+              alt={`${product.name} - ${product.category?.name || 'designer fragrance'} from Roc Realm Perfumes, Owerri, Imo State`}
+              width="1200"
+              height="1200"
+              fetchPriority="high"
+              decoding="async"
+              className={`h-full w-full object-contain transition-transform duration-300 ${isZoomed ? 'scale-150' : 'scale-100'}`}
+              style={{
+                transformOrigin: isZoomed ? `${zoomPosition.x}% ${zoomPosition.y}%` : 'center',
+                transform: isZoomed ? 'scale(2)' : 'scale(1)'
+              }}
+            />
+          </div>
         </div>
-        {product.images?.length > 1 && <div className="mt-4 flex gap-3 overflow-auto pb-2">{product.images.map((image) => <button key={image} onClick={() => setActiveImage(image)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white p-1 ${activeImage === image ? 'border-amber-600' : 'border-transparent'}`}><img src={image} alt={product.name} className="h-full w-full object-contain" /></button>)}</div>}
+        {product.images?.length > 1 && <div className="mt-4 flex gap-3 overflow-auto pb-2">{product.images.map((image) => <button key={image} onClick={() => setActiveImage(image)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white p-1 ${activeImage === image ? 'border-amber-600' : 'border-transparent'}`}><img src={image} alt={`${product.name} - ${product.category?.name || 'fragrance'} photo ${product.images.indexOf(image) + 1} at Roc Realm Perfumes Owerri`} loading="lazy" className="h-full w-full object-contain" /></button>)}</div>}
       </div>
       <div className="py-6">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-700">{product.category?.name}</p>
@@ -84,7 +135,9 @@ export default function ProductDetails() {
         {outOfStock && <form onSubmit={submitStockAlert} className="mt-8 rounded-[2rem] bg-amber-50 p-5"><h2 className="font-display text-2xl font-semibold">Notify me when available</h2><p className="mt-2 text-sm text-stone-600">Drop your WhatsApp number and admin will see your restock request.</p><div className="mt-4 grid gap-3 sm:grid-cols-2"><input placeholder="Name optional" value={alertName} onChange={(e) => setAlertName(e.target.value)} className="rounded-full bg-white px-4 py-3 outline-none" /><input required placeholder="WhatsApp number" value={alertPhone} onChange={(e) => setAlertPhone(e.target.value)} className="rounded-full bg-white px-4 py-3 outline-none" /></div><button className="mt-4 rounded-full bg-stone-950 px-6 py-3 font-semibold text-white">Notify me</button>{alertMessage && <p className="mt-3 text-sm font-semibold text-amber-900">{alertMessage}</p>}</form>}
       </div>
       </div>
+      <ProductReviews productId={product.id} />
       {related.length > 0 && <section className="mt-16"><h2 className="font-display text-4xl font-semibold">You may also like</h2><div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{related.map((item) => <ProductCard key={item.id} product={item} />)}</div></section>}
+      {recentlyViewed.length > 1 && <section className="mt-16"><h2 className="font-display text-4xl font-semibold">Recently Viewed</h2><div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{recentlyViewed.filter((p) => p.slug !== slug).slice(0, 5).map((item) => <ProductCard key={item.id} product={item} />)}</div></section>}
     </main>
   );
 }

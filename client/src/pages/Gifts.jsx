@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api.js';
+import { setPageMeta } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
 const sections = [
@@ -11,7 +12,13 @@ const sections = [
 
 export default function Gifts() {
   const [products, setProducts] = useState([]);
-  useEffect(() => { api.get('/products').then((res) => setProducts(res.data.products)).catch(() => setProducts([])); }, []);
+  useEffect(() => { 
+    setPageMeta({ 
+      title: 'Perfume Gifts', 
+      description: 'Perfume gift sets, birthday and anniversary fragrances for her and him at Roc Realm Perfumes, Owerri, with gift-ready packaging.' 
+    });
+    api.get('/products').then((res) => setProducts(res.data.products)).catch(() => setProducts([])); 
+  }, []);
   const grouped = useMemo(() => Object.fromEntries(sections.map(([title, key]) => [title, products.filter((product) => {
     const text = `${product.name} ${product.description} ${product.category?.name} ${product.gender} ${product.occasion}`.toLowerCase();
     if (key === 'female') return text.includes('female') || text.includes('women') || text.includes('her');

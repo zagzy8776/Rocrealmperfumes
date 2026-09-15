@@ -1,10 +1,17 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin/
 Disallow: /cart
 Disallow: /checkout
 Disallow: /order-success
 Disallow: /wishlist
 Disallow: /api/
+Disallow: /*?search=
+Disallow: /*?utm_
+Disallow: /*?fbclid=
+Disallow: /*?gclid=
+Disallow: /*?ref=
 
-# The production build generates the absolute Sitemap URL from VITE_SITE_URL.
+# The production build writes robots.txt into dist/ with the absolute Sitemap URL
+# generated from VITE_SITE_URL, for example: https://your-domain/sitemap.xml

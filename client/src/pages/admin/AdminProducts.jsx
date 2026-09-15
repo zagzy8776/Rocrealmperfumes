@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Edit3, Image, ImagePlus, Plus, Search, Trash2, UploadCloud, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Download, Edit3, Image, ImagePlus, Plus, Search, Trash2, UploadCloud, X, CheckSquare, Square } from 'lucide-react';
 import { api, formatNaira } from '../../lib/api.js';
 
 const empty = { name: '', description: '', price: '', costPrice: '', salePrice: '', size: '', notes: '', images: '', stock: 0, isFeatured: false, isActive: true, categoryId: '' };
@@ -14,6 +14,8 @@ export default function AdminProducts() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const load = async () => {
     const [productRes, categoryRes] = await Promise.all([api.get('/products/admin/all'), api.get('/categories')]);
@@ -98,6 +100,76 @@ export default function AdminProducts() {
 
   const previewImage = form.images.split('\n').map((item) => item.trim()).filter(Boolean)[0];
 
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map((p) => p.id)));
+    }
+  };
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Delete ${selectedIds.size} selected products?`)) return;
+    setBulkLoading(true);
+    try {
+      await Promise.all([...selectedIds].map((id) => api.delete(`/products/${id}`)));
+      setMessage(`${selectedIds.size} products deleted.`);
+      setSelectedIds(new Set());
+      load();
+    } catch (err) {
+      setError('Failed to delete some products.');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const bulkToggleActive = async () => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    try {
+      await Promise.all([...selectedIds].map((id) => api.put(`/products/${id}`, { isActive: true })));
+      setMessage(`${selectedIds.size} products activated.`);
+      setSelectedIds(new Set());
+      load();
+    } catch (err) {
+      setError('Failed to update products.');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const exportToCSV = () => {
+    const headers = ['ID', 'Name', 'Category', 'Price', 'Sale Price', 'Stock', 'Featured', 'Active'];
+    const rows = filteredProducts.map((p) => [
+      p.id,
+      p.name,
+      p.category?.name || 'N/A',
+      p.price,
+      p.salePrice || 'N/A',
+      p.stock,
+      p.isFeatured ? 'Yes' : 'No',
+      p.isActive ? 'Yes' : 'No',
+    ]);
+    const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <section className="p-6 lg:p-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -154,7 +226,17 @@ export default function AdminProducts() {
         </aside>
       </form>
 
-      <div className="mt-8 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+          {selectedIds.size > 0 && (
+            <>
+              <span className="text-sm font-semibold text-stone-600">{selectedIds.size} selected</span>
+              <button onClick={bulkToggleActive} disabled={bulkLoading} className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-800 disabled:opacity-60">Activate All</button>
+              <button onClick={bulkDelete} disabled={bulkLoading} className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"><Trash2 size={15} /> Delete All</button>
+            </>
+          )}
+          <button onClick={exportToCSV} className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-2 text-sm font-semibold text-stone-800 hover:bg-stone-200"><Download size={15} /> Export CSV</button>
+        </div>
         <label className="flex items-center gap-3 rounded-full bg-stone-100 px-4">
           <Search size={18} className="text-stone-500" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products or categories..." className="w-full bg-transparent py-3 outline-none" />
@@ -162,8 +244,17 @@ export default function AdminProducts() {
       </div>
 
       <div className="mt-5 grid gap-4">
+        <div className="flex items-center gap-2">
+          <button onClick={toggleSelectAll} className="p-2 hover:bg-stone-100 rounded-full">
+            {selectedIds.size === filteredProducts.length ? <CheckSquare size={18} /> : <Square size={18} />}
+          </button>
+          <span className="text-sm text-stone-600">Select All</span>
+        </div>
         {filteredProducts.map((product) => (
-          <div key={product.id} className="grid gap-4 rounded-[2rem] bg-white p-4 shadow-sm md:grid-cols-[90px_1fr_130px_190px] md:items-center">
+          <div key={product.id} className="grid gap-4 rounded-[2rem] bg-white p-4 shadow-sm md:grid-cols-[50px_90px_1fr_130px_190px] md:items-center">
+            <button onClick={() => toggleSelect(product.id)} className="p-2 hover:bg-stone-100 rounded-full">
+              {selectedIds.has(product.id) ? <CheckSquare size={18} className="text-amber-700" /> : <Square size={18} />}
+            </button>
             <img src={product.images?.[0] || 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80'} alt={product.name} className="h-24 w-24 rounded-2xl bg-amber-50 object-contain p-1" />
             <div>
               <div className="flex flex-wrap items-center gap-2"><strong>{product.name}</strong>{product.isFeatured && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800">Featured</span>}{!product.isActive && <span className="rounded-full bg-red-50 px-2 py-1 text-xs text-red-700">Hidden</span>}</div>

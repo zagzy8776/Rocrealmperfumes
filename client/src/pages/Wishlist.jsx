@@ -1,11 +1,48 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Trash2 } from 'lucide-react';
+import { MessageCircle, Trash2, Share2, Copy, Check } from 'lucide-react';
 import { formatNaira, whatsappNumber } from '../lib/api.js';
 import { useWishlist } from '../context/WishlistContext.jsx';
+import { setPageMeta } from '../lib/seo.js';
 
 export default function Wishlist() {
   const { items, toggleWishlist, clearWishlist } = useWishlist();
-  const message = encodeURIComponent(`Hello Roc Realm Perfumes, these are the items on my wishlist:\n\n${items.map((item, index) => `${index + 1}. ${item.name} - ${formatNaira(item.price)}`).join('\n')}\n\nPlease help me confirm availability.`);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setPageMeta({ 
+      title: 'My Perfume Wishlist | Roc Realm Owerri Imo State', 
+      description: 'Save your favorite perfumes from Roc Realm Perfumes - #1 perfume store in Owerri, Imo State. Original designer Arabian fragrances, vanilla gourmand, pistachio perfumes. Share your wishlist.',
+      noindex: true
+    });
+  }, []);
+  
+  const message = encodeURIComponent(`Hello Roc Realm Perfume, these are the items on my wishlist:\n\n${items.map((item, index) => `${index + 1}. ${item.name} - ${formatNaira(item.price)}`).join('\n')}\n\nPlease help me confirm availability.`);
+  
+  const shareText = `My Roc Realm Wishlist:\n\n${items.map((item, index) => `${index + 1}. ${item.name} - ${formatNaira(item.price)}`).join('\n')}\n\nCheck them out at Roc Realm Perfumes!`;
+
+  const handleCopyLink = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'My Roc Realm Wishlist',
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Share failed:', err);
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -25,7 +62,13 @@ export default function Wishlist() {
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <article key={item.id} className="flex gap-4 rounded-[2rem] bg-white p-4 shadow-sm">
-                <Link to={`/product/${item.slug}`}><img src={item.image} alt={item.name} className="h-28 w-24 rounded-2xl bg-amber-50 object-contain p-1" /></Link>
+                <Link to={`/product/${item.slug}`}>
+                  <img 
+                    src={item.image} 
+                    alt={`${item.name} ${item.category || 'perfume'} - Original fragrance Owerri Imo State`} 
+                    className="h-28 w-24 rounded-2xl bg-amber-50 object-contain p-1" 
+                  />
+                </Link>
                 <div className="flex flex-1 flex-col justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-amber-700">{item.category || 'Roc Realm'}</p>
@@ -39,6 +82,8 @@ export default function Wishlist() {
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href={`https://wa.me/${whatsappNumber}?text=${message}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-green-600 px-7 py-4 font-semibold text-white"><MessageCircle size={18} /> Send Wishlist on WhatsApp</a>
+            <button onClick={handleShare} className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-7 py-4 font-semibold text-white hover:bg-amber-700"><Share2 size={18} /> Share Wishlist</button>
+            <button onClick={handleCopyLink} className="inline-flex items-center gap-2 rounded-full border border-amber-900/20 px-7 py-4 font-semibold text-stone-800 hover:bg-stone-100">{copied ? <Check size={18} /> : <Copy size={18} />} {copied ? 'Copied!' : 'Copy Link'}</button>
             <button onClick={clearWishlist} className="rounded-full border border-amber-900/20 px-7 py-4 font-semibold text-stone-800">Clear wishlist</button>
           </div>
         </>

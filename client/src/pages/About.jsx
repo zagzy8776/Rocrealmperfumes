@@ -1,6 +1,16 @@
+import { useEffect } from 'react';
 import { businessInfo } from '../lib/api.js';
+import { setPageMeta, setOrganizationStructuredData } from '../lib/seo.js';
 
 export default function About() {
+  useEffect(() => {
+    setPageMeta({ 
+      title: 'About Roc Realm Perfumes | Best Perfume Store Owerri Imo State', 
+      description: 'Roc Realm Nigeria Limited is a perfume store in Owerri, Imo State selling original designer, Arabian and oil perfumes, diffusers and home scents.' 
+    });
+    setOrganizationStructuredData();
+  }, []);
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       <p className="text-sm uppercase tracking-[0.3em] text-amber-700">About</p>

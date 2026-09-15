@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Camera, Search, Sparkles, X } from 'lucide-react';
 import { api } from '../lib/api.js';
+import { setPageMeta } from '../lib/seo.js';
 
 const PAGE_SIZE = 24;
 
 export default function Gallery() {
+  useEffect(() => {
+    setPageMeta({ 
+      title: 'Roc Realm Gallery', 
+      description: 'Browse Roc Realm Perfumes gallery - new arrivals, product drops, store moments, gift ideas, body mists, diffusers, and luxury fragrance updates.' 
+    });
+  }, []);
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);

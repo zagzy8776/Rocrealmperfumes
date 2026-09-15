@@ -9,19 +9,34 @@ export default function AdminTestimonials() {
   const [form, setForm] = useState(empty);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const load = () => api.get('/testimonials/admin/all').then((res) => setItems(res.data.testimonials));
-  useEffect(() => { load().catch((err) => setError(err.response?.data?.message || 'Unable to load testimonials.')); }, []);
+  const load = async () => {
+    setInitialLoading(true);
+    try {
+      const res = await api.get('/testimonials/admin/all');
+      setItems(res.data.testimonials);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to load testimonials.');
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+  useEffect(() => { load(); }, []);
 
   const submit = async (e) => {
     e.preventDefault();
     setError(''); setMessage('');
+    setLoading(true);
     try {
       await api.post('/testimonials', { ...form, rating: Number(form.rating) });
       setForm(empty);
       setMessage('Testimonial added.');
-      load();
-    } catch (err) { setError(err.response?.data?.message || 'Could not save testimonial.'); }
+      await load();
+    } catch (err) { setError(err.response?.data?.message || 'Could not save testimonial.'); } finally {
+      setLoading(false);
+    }
   };
 
   const remove = async (id) => { if (confirm('Delete testimonial?')) { await api.delete(`/testimonials/${id}`); setMessage('Testimonial deleted.'); load(); } };
@@ -35,6 +50,7 @@ export default function AdminTestimonials() {
       </div>
       {message && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-green-50 p-4 text-green-700"><CheckCircle2 size={18} /> {message}</div>}
       {error && <p className="mt-6 rounded-2xl bg-red-50 p-4 text-red-700">{error}</p>}
+      {initialLoading && <div className="mt-6 rounded-2xl bg-amber-50 p-4 text-center text-amber-800">Loading testimonials...</div>}
       <form onSubmit={submit} className="mt-8 grid gap-4 rounded-[2rem] bg-white p-6 shadow-sm md:grid-cols-2">
         <input required placeholder="Customer name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />
         <input placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="rounded-2xl bg-stone-100 px-4 py-3 outline-none" />

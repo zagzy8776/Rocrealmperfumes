@@ -1,2 +1,22 @@
-import { useEffect } from 'react';import { useLocation } from 'react-router-dom';import { trackPageView } from '../lib/analytics.js';import { setCanonicalMeta,setJsonLd,setOrganizationStructuredData,setPageMeta,setProductStructuredData } from '../lib/seo.js';import { api } from '../lib/api.js';import { blogPosts } from '../lib/blogPosts.js';
-export default function RouteTracker(){const location=useLocation();useEffect(()=>{setOrganizationStructuredData();setCanonicalMeta({url:window.location.href,noindex:/^\/(admin|cart|checkout|order-success|wishlist)/.test(location.pathname)});const timer=window.setTimeout(()=>trackPageView(),250);return()=>window.clearTimeout(timer)},[location.pathname,location.search]);useEffect(()=>{const productMatch=location.pathname.match(/^\/product\/([^/]+)/);if(productMatch){let active=true;api.get(`/products/${productMatch[1]}`).then(res=>{if(!active)return;const p=res.data.product;setPageMeta({title:p.name,description:p.description||`Buy ${p.name} from Roc Realm Perfumes in Owerri, Nigeria.`,image:p.images?.[0],url:window.location.href,type:'product'});setProductStructuredData(p)}).catch(()=>{});return()=>{active=false;};}const blogMatch=location.pathname.match(/^\/blog\/([^/]+)/);if(blogMatch){const post=blogPosts.find(item=>item.slug===blogMatch[1]);if(post){setJsonLd('article-jsonld',{'@context':'https://schema.org','@type':'Article',headline:post.title,description:post.excerpt,url:window.location.href,author:{'@type':'Organization',name:'Roc Realm Perfumes'},publisher:{'@type':'Organization',name:'Roc Realm Perfumes'}});}}return undefined;},[location.pathname]);return null;}
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { trackPageView } from '../lib/analytics.js';
+import { setCanonicalMeta, setLocalGeoMeta, setOrganizationStructuredData, clearPageStructuredData } from '../lib/seo.js';
+
+export default function RouteTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    setOrganizationStructuredData();
+    setLocalGeoMeta();
+    setCanonicalMeta({ url: `${window.location.origin}${location.pathname}${location.search}` });
+    const timer = window.setTimeout(() => trackPageView(), 250);
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    clearPageStructuredData();
+  }, [location.pathname, location.search]);
+
+  return null;
+}

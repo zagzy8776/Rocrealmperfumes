@@ -1,7 +1,150 @@
-const SITE_URL=(import.meta.env.VITE_SITE_URL||window.location.origin).replace(/\/$/,'');const DEFAULT_IMAGE=`${SITE_URL}/og-image.svg`;const SITE_TITLE='Roc Realm Perfumes | Luxury Perfumes in Owerri';const DEFAULT_DESCRIPTION='Shop original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and home scents in Owerri, Imo State.';
-const upsert=(selector,attributes)=>{let tag=document.head.querySelector(selector);if(!tag){tag=document.createElement('meta');document.head.appendChild(tag);}Object.entries(attributes).forEach(([key,value])=>tag.setAttribute(key,value));};const canonical=url=>{let link=document.head.querySelector('link[rel="canonical"]');if(!link){link=document.createElement('link');link.rel='canonical';document.head.appendChild(link);}link.href=url;};const absolute=value=>{if(!value)return DEFAULT_IMAGE;try{return new URL(value,SITE_URL).href}catch{return DEFAULT_IMAGE;}};
-export const setCanonicalMeta=({url,noindex=false}={})=>{const finalUrl=url?new URL(url,SITE_URL).href:`${SITE_URL}${window.location.pathname}`;canonical(finalUrl);upsert('meta[name="robots"]',{name:'robots',content:noindex?'noindex,follow':'index,follow'});};
-export const setPageMeta=({title,description,image,url,type='website',noindex=false}={})=>{const finalTitle=title?`${title} | Roc Realm Perfumes`:SITE_TITLE;const finalDescription=description||DEFAULT_DESCRIPTION;const finalUrl=url?new URL(url,SITE_URL).href:`${SITE_URL}${window.location.pathname}`;const finalImage=absolute(image);document.title=finalTitle;upsert('meta[name="description"]',{name:'description',content:finalDescription});upsert('meta[name="robots"]',{name:'robots',content:noindex?'noindex,follow':'index,follow'});upsert('meta[property="og:title"]',{property:'og:title',content:finalTitle});upsert('meta[property="og:description"]',{property:'og:description',content:finalDescription});upsert('meta[property="og:type"]',{property:'og:type',content:type});upsert('meta[property="og:url"]',{property:'og:url',content:finalUrl});upsert('meta[property="og:image"]',{property:'og:image',content:finalImage});upsert('meta[property="og:site_name"]',{property:'og:site_name',content:'Roc Realm Perfumes'});upsert('meta[property="og:locale"]',{property:'og:locale',content:'en_NG'});upsert('meta[name="twitter:card"]',{name:'twitter:card',content:'summary_large_image'});upsert('meta[name="twitter:title"]',{name:'twitter:title',content:finalTitle});upsert('meta[name="twitter:description"]',{name:'twitter:description',content:finalDescription});upsert('meta[name="twitter:image"]',{name:'twitter:image',content:finalImage});canonical(finalUrl);};
-export const setJsonLd=(id,data)=>{let script=document.getElementById(id);if(!script){script=document.createElement('script');script.id=id;script.type='application/ld+json';document.head.appendChild(script);}script.textContent=JSON.stringify(data);};
-export const setProductStructuredData=product=>{if(!product)return;const url=`${SITE_URL}/product/${product.slug}`;setJsonLd('product-jsonld',{'@context':'https://schema.org','@type':'Product',name:product.name,description:product.description||DEFAULT_DESCRIPTION,image:(product.images||[]).map(absolute),sku:product.id,category:product.category?.name,brand:product.brandType?{'@type':'Brand',name:product.brandType}:undefined,offers:{'@type':'Offer',url,priceCurrency:'NGN',price:Number(product.salePrice||product.price),availability:product.stock>0?'https://schema.org/InStock':'https://schema.org/OutOfStock'}});setJsonLd('breadcrumb-jsonld',{'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'Home',item:SITE_URL},{'@type':'ListItem',position:2,name:'Shop',item:`${SITE_URL}/shop`},{'@type':'ListItem',position:3,name:product.name,item:url}]});};
-export const setOrganizationStructuredData=()=>setJsonLd('organization-jsonld',{'@context':'https://schema.org','@type':'LocalBusiness',name:'Roc Realm Perfumes',url:SITE_URL,telephone:'+2349084782126',email:'rocrealmnigerialimited@gmail.com',address:{'@type':'PostalAddress',addressLocality:'Owerri',addressRegion:'Imo State',addressCountry:'NG'}});
+import { SITE_URL, DEFAULT_OG_IMAGE, absoluteUrl, canonicalUrl, isNoindexPath, buildTitle } from './site.js';
+import { LOCATION_KEYWORD_LINE, TRENDING_KEYWORD_LINE } from './keywords.js';
+import {
+  organizationStructuredData,
+  websiteStructuredData,
+  breadcrumbStructuredData,
+  productStructuredData,
+  itemListStructuredData,
+  faqStructuredData,
+  articleStructuredData,
+} from './schema.js';
+
+export { SITE_URL, DEFAULT_OG_IMAGE };
+
+const OG_WIDTH = '1200';
+const OG_HEIGHT = '630';
+const BRAND = 'Roc Realm Perfumes';
+const DEFAULT_DESCRIPTION = `Shop original designer and Arabian perfumes, oil perfumes, body mists, diffusers and gift sets at Roc Realm Perfumes in Owerri, Imo State. Trending notes: ${TRENDING_KEYWORD_LINE}. Delivery to ${LOCATION_KEYWORD_LINE}.`;
+
+const PAGE_SCHEMA_IDS = ['product-jsonld', 'breadcrumb-jsonld', 'faq-jsonld', 'article-jsonld', 'itemlist-jsonld'];
+const GLOBAL_SCHEMA_IDS = ['organization-jsonld', 'website-jsonld'];
+
+const upsertMeta = (selector, attributes) => {
+  let tag = document.head.querySelector(selector);
+  if (!tag) {
+    tag = document.createElement('meta');
+    document.head.appendChild(tag);
+  }
+  Object.entries(attributes).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    tag.setAttribute(key, value);
+  });
+};
+
+const removeById = (id) => {
+  const node = document.getElementById(id);
+  if (node) node.remove();
+};
+
+export const clearPageStructuredData = () => PAGE_SCHEMA_IDS.forEach(removeById);
+export const clearAllStructuredData = () => [...PAGE_SCHEMA_IDS, ...GLOBAL_SCHEMA_IDS].forEach(removeById);
+
+export const setJsonLd = (id, data) => {
+  if (!data) return;
+  let script = document.getElementById(id);
+  if (!script) {
+    script = document.createElement('script');
+    script.id = id;
+    script.type = 'application/ld+json';
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify(data);
+};
+
+export const setCanonicalMeta = ({ url, noindex = false } = {}) => {
+  const href = canonicalUrl(url || window.location.href);
+  let link = document.head.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', href);
+  const blocked = noindex || isNoindexPath(window.location.pathname, window.location.search);
+  upsertMeta('meta[name="robots"]', {
+    name: 'robots',
+    content: blocked
+      ? 'noindex,follow'
+      : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
+  });
+};
+
+export const setLocalGeoMeta = () => {
+  upsertMeta('meta[name="geo.region"]', { name: 'geo.region', content: 'NG-IM' });
+  upsertMeta('meta[name="geo.placename"]', { name: 'geo.placename', content: 'Owerri, Imo State' });
+  upsertMeta('meta[name="ICBM"]', { name: 'ICBM', content: '5.4897, 7.0342' });
+  upsertMeta('meta[name="author"]', { name: 'author', content: 'Roc Realm Nigeria Limited' });
+};
+
+export const setPageMeta = ({ title, description, image, url, type = 'website', noindex = false, keywords } = {}) => {
+  const finalTitle = buildTitle(title);
+  const finalDescription = description || DEFAULT_DESCRIPTION;
+  const finalUrl = canonicalUrl(url || window.location.href);
+  const finalImage = absoluteUrl(image);
+  document.title = finalTitle;
+  upsertMeta('meta[name="description"]', { name: 'description', content: finalDescription });
+  if (keywords) upsertMeta('meta[name="keywords"]', { name: 'keywords', content: keywords });
+  upsertMeta('meta[property="og:title"]', { property: 'og:title', content: finalTitle });
+  upsertMeta('meta[property="og:description"]', { property: 'og:description', content: finalDescription });
+  upsertMeta('meta[property="og:type"]', { property: 'og:type', content: type });
+  upsertMeta('meta[property="og:url"]', { property: 'og:url', content: finalUrl });
+  upsertMeta('meta[property="og:image"]', { property: 'og:image', content: finalImage });
+  upsertMeta('meta[property="og:image:width"]', { property: 'og:image:width', content: OG_WIDTH });
+  upsertMeta('meta[property="og:image:height"]', { property: 'og:image:height', content: OG_HEIGHT });
+  upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${BRAND} - perfume store in Owerri, Imo State` });
+  upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: BRAND });
+  upsertMeta('meta[property="og:locale"]', { property: 'og:locale', content: 'en_NG' });
+  upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+  upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: finalTitle });
+  upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: finalDescription });
+  upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: finalImage });
+  upsertMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${BRAND} - perfume store in Owerri, Imo State` });
+  setCanonicalMeta({ url: finalUrl, noindex });
+};
+
+export const setOrganizationStructuredData = (testimonials = []) => {
+  setJsonLd('organization-jsonld', organizationStructuredData(testimonials));
+  setJsonLd('website-jsonld', websiteStructuredData());
+};
+
+export const setProductStructuredData = (product, reviews = []) => {
+  if (!product) return;
+  setJsonLd('product-jsonld', productStructuredData(product, reviews));
+  setBreadcrumbStructuredData([
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+    { name: product.name, path: `/product/${product.slug}` },
+  ]);
+};
+
+export const setArticleStructuredData = (post) => {
+  if (!post) return;
+  setJsonLd('article-jsonld', articleStructuredData(post));
+  setBreadcrumbStructuredData([
+    { name: 'Home', path: '/' },
+    { name: 'Fragrance Journal', path: '/blog' },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ]);
+};
+
+export const setFAQStructuredData = (items = []) => {
+  if (!items.length) return;
+  setJsonLd('faq-jsonld', faqStructuredData(items));
+};
+
+export const setBreadcrumbStructuredData = (items = []) => {
+  if (!items.length) return;
+  setJsonLd('breadcrumb-jsonld', breadcrumbStructuredData(items));
+};
+
+export const setItemListStructuredData = (products = [], name) => {
+  if (!products.length) return;
+  setJsonLd('itemlist-jsonld', itemListStructuredData(products, name));
+};
+
+export const setCategoryBreadcrumbSchema = (categoryName, categorySlug) => {
+  const items = [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }];
+  if (categoryName && categorySlug) items.push({ name: categoryName, path: `/shop?category=${categorySlug}` });
+  setBreadcrumbStructuredData(items);
+};

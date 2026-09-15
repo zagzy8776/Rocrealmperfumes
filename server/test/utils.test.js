@@ -4,7 +4,9 @@ const makeSlug = require('../src/utils/slug');
 const { calculateDiscount } = require('../src/routes/coupons');
 
 test('product slugs are stable and URL-safe', () => {
-  assert.equal(makeSlug('  Oud Wood & Amber  '), 'oud-wood-amber');
+  // The slugify charmap maps "&" to "and" (and strict:true strips anything unknown),
+  // so this is the documented output for ampersand-containing product names.
+  assert.equal(makeSlug('  Oud Wood & Amber  '), 'oud-wood-and-amber');
 });
 
 test('percentage coupons never exceed subtotal', () => {

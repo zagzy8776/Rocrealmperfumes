@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { api } from '../lib/api.js';
-import { setPageMeta } from '../lib/seo.js';
+import { setPageMeta, setCategoryBreadcrumbSchema } from '../lib/seo.js';
 import ProductCard from '../components/ProductCard.jsx';
 
 const PRODUCTS_PER_BATCH = 12;
@@ -10,25 +10,48 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('new');
   const [availability, setAvailability] = useState('all');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasMore: false });
   const [loading, setLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
 
   useEffect(() => {
-    setPageMeta({ title: 'Shop Perfumes', description: 'Browse Roc Realm Perfumes collection: original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, gift sets, and home scents in Owerri.' });
+    setPageMeta({ 
+      title: 'Shop Perfumes in Owerri | Original Fragrances Imo State',
+      description: 'Shop original designer, Arabian and oil perfumes, oud and gift sets at Roc Realm Perfumes, Owerri. Owerri delivery plus nationwide dispatch.'
+    });
     api.get('/categories').then((res) => setCategories(res.data.categories)).catch(() => setCategories([]));
   }, []);
 
+  useEffect(() => {
+    if (category) {
+      const selectedCategory = categories.find(cat => cat.slug === category);
+      if (selectedCategory) {
+        setCategoryBreadcrumbSchema(selectedCategory.name, selectedCategory.slug);
+      }
+    } else {
+      setCategoryBreadcrumbSchema('Shop', '');
+    }
+  }, [category, categories]);
+
   const fetchProducts = async (targetPage = 1) => {
     const params = new URLSearchParams();
-    if (category) params.set('category', category);
+    if (selectedCategories.length > 0) {
+      selectedCategories.forEach(cat => params.append('category', cat));
+    } else if (category) {
+      params.set('category', category);
+    }
     if (search) params.set('search', search);
     if (availability !== 'all') params.set('availability', availability);
     if (sort !== 'new') params.set('sort', sort);
+    if (priceRange.min) params.set('minPrice', priceRange.min);
+    if (priceRange.max) params.set('maxPrice', priceRange.max);
     params.set('page', String(targetPage));
     params.set('limit', String(PRODUCTS_PER_BATCH));
 
@@ -47,14 +70,28 @@ export default function Shop() {
     }
   };
 
-  useEffect(() => { fetchProducts(1); }, [category, search, sort, availability]);
+  useEffect(() => { fetchProducts(1); }, [category, search, sort, availability, selectedCategories, priceRange]);
 
-  const pageNumbers = useMemo(() => {
-    const totalPages = Math.max(1, pagination.totalPages || 1);
-    const start = Math.max(1, page - 2);
-    const end = Math.min(totalPages, start + 4);
-    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-  }, [page, pagination.totalPages]);
+  const toggleCategory = (slug) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(slug)) {
+        return prev.filter(c => c !== slug);
+      } else {
+        return [...prev, slug];
+      }
+    });
+  };
+
+  const clearFilters = () => {
+    setCategory('');
+    setSelectedCategories([]);
+    setSearch('');
+    setSort('new');
+    setAvailability('all');
+    setPriceRange({ min: '', max: '' });
+  };
+
+  const hasActiveFilters = selectedCategories.length > 0 || search || availability !== 'all' || priceRange.min || priceRange.max;
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -64,24 +101,81 @@ export default function Shop() {
         <p className="mt-4 max-w-2xl text-stone-300">Browse original designer Arabian fragrances, oil perfumes, body mists, sprays, diffusers, humidifiers, and gift-ready selections.</p>
       </div>
 
-      <div className="mt-8 grid gap-4 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm md:grid-cols-[1fr_220px_180px_180px]">
-        <label className="flex items-center gap-3 rounded-full bg-stone-100 px-4">
-          <Search size={18} className="text-stone-500" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search perfumes, body mists, diffusers..." className="w-full bg-transparent py-3 outline-none" />
-        </label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none">
-          <option value="">All categories</option>
-          {categories.map((cat) => <option key={cat.id} value={cat.slug}>{cat.name}</option>)}
-        </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none">
-          <option value="new">Newest</option>
-          <option value="low">Price: Low</option>
-          <option value="high">Price: High</option>
-        </select>
-        <select value={availability} onChange={(e) => setAvailability(e.target.value)} className="rounded-full bg-stone-100 px-4 py-3 outline-none">
-          <option value="all">All stock</option>
-          <option value="available">Available only</option>
-        </select>
+      <div className="mt-8 rounded-[2rem] border border-amber-900/10 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <button onClick={() => setShowFilters(!showFilters)} className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-3 font-semibold text-stone-800 hover:bg-stone-200">
+            <SlidersHorizontal size={18} />
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+          {hasActiveFilters && (
+            <button onClick={clearFilters} className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">
+              <X size={16} />
+              Clear All
+            </button>
+          )}
+          <label className="flex items-center gap-3 rounded-full bg-stone-100 px-4 flex-1 max-w-md">
+            <Search size={18} className="text-stone-500" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search perfumes, body mists, diffusers..." className="w-full bg-transparent py-3 outline-none" />
+          </label>
+        </div>
+
+        {showFilters && (
+          <div className="mt-4 grid gap-4 border-t border-amber-900/10 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">Categories</label>
+              <div className="max-h-40 space-y-2 overflow-y-auto rounded-2xl bg-stone-50 p-3">
+                {categories.map((cat) => (
+                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(cat.slug)}
+                      onChange={() => toggleCategory(cat.slug)}
+                      className="rounded border-amber-900/20 text-amber-700 focus:ring-amber-700"
+                    />
+                    <span className="text-sm text-stone-700">{cat.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">Price Range (₦)</label>
+              <div className="grid gap-2">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                  className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"
+                />
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                  className="rounded-2xl bg-stone-100 px-4 py-3 outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">Sort By</label>
+              <select value={sort} onChange={(e) => setSort(e.target.value)} className="w-full rounded-2xl bg-stone-100 px-4 py-3 outline-none">
+                <option value="new">Newest First</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+                <option value="popular">Most Popular</option>
+                <option value="rating">Highest Rated</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">Availability</label>
+              <select value={availability} onChange={(e) => setAvailability(e.target.value)} className="w-full rounded-2xl bg-stone-100 px-4 py-3 outline-none">
+                <option value="all">All Products</option>
+                <option value="available">In Stock Only</option>
+                <option value="outofstock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 grid gap-3 rounded-[2rem] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-5">

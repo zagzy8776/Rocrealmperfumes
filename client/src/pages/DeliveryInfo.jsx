@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { CreditCard, HelpCircle, MapPin, MessageCircle, PackageCheck, Truck } from 'lucide-react';
 import { businessInfo, whatsappNumber } from '../lib/api.js';
+import { setPageMeta, setFAQStructuredData } from '../lib/seo.js';
+import { LOCATION_KEYWORD_LINE } from '../lib/keywords.js';
+import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 const faqs = [
   ['Do you deliver in Owerri?', 'Yes. Roc Realm coordinates delivery within Owerri and can discuss delivery options for other locations.'],
@@ -9,9 +14,19 @@ const faqs = [
 ];
 
 export default function DeliveryInfo() {
+  useEffect(() => {
+    setPageMeta({
+      title: 'Perfume Delivery in Owerri and Nigeria',
+      description: 'Delivery fees and options: free pickup in Uratta Owerri, Owerri delivery 3,000 naira, and 1,000 naira waybill or park dispatch nationwide.',
+      keywords: ['perfume delivery Owerri', 'perfume delivery Port Harcourt', 'perfume delivery Onitsha', 'perfume delivery Enugu', 'perfume delivery fees Nigeria'],
+    });
+    setFAQStructuredData(faqs.map(([question, answer]) => ({ question, answer })));
+  }, []);
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <section className="luxury-gradient rounded-[2.5rem] p-8 text-white md:p-12">
+      <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Delivery', path: '/delivery' }]} />
+      <section className="luxury-gradient mt-6 rounded-[2.5rem] p-8 text-white md:p-12">
         <p className="text-sm uppercase tracking-[0.3em] text-amber-300">Delivery & Help</p>
         <h1 className="mt-3 font-display text-5xl font-semibold">Easy perfume shopping in Owerri.</h1>
         <p className="mt-5 max-w-2xl text-stone-300">Order online, confirm on WhatsApp, and get support choosing original designer Arabian fragrances, oil perfumes, body mists, diffusers, humidifiers, and gifts.</p>
@@ -35,6 +50,33 @@ export default function DeliveryInfo() {
           <div className="rounded-2xl bg-amber-50 p-4"><strong>Waybill / park dispatch — ₦1,000</strong><p className="mt-1 text-sm text-stone-600">Covers sending your order to the park. Transport/rider may contact you for remaining delivery cost based on location.</p></div>
           <div className="rounded-2xl bg-amber-50 p-4"><strong>Lagos supplier delivery / other states dispatch — Fee confirmed after order</strong><p className="mt-1 text-sm text-stone-600">Lagos orders may be sent directly from our Lagos suppliers with same-day or next-day delivery after confirmation. Other locations are coordinated based on destination.</p></div>
         </div>
+      </section>
+
+      <section className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-[2.5rem] bg-white p-6 shadow-sm md:p-8">
+          <h2 className="font-display text-3xl font-semibold">Visit or send to our Owerri store</h2>
+          <p className="mt-4 leading-8 text-stone-700">{businessInfo.fullAddress}</p>
+          <p className="mt-2 text-stone-700">Open {businessInfo.openingHours}.</p>
+          <p className="mt-2 text-stone-700">
+            Store line: <a href={`tel:${businessInfo.callLine}`} className="font-semibold text-amber-800">{businessInfo.callLine}</a>
+          </p>
+          <ul className="mt-6 flex flex-wrap gap-3">
+            <li><Link to="/locations/owerri" className="rounded-full bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">Perfume shop in Owerri</Link></li>
+            <li><Link to="/locations/port-harcourt" className="rounded-full bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">Delivery in Port Harcourt</Link></li>
+            <li><Link to="/locations/onitsha" className="rounded-full bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">Delivery in Onitsha</Link></li>
+            <li><Link to="/locations/anambra" className="rounded-full bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">Delivery in Anambra</Link></li>
+            <li><Link to="/locations/enugu" className="rounded-full bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">Delivery in Enugu</Link></li>
+          </ul>
+        </div>
+        <aside className="h-fit rounded-[2.5rem] bg-white p-4 shadow-sm">
+          <iframe
+            title="Google Map showing Roc Realm Perfumes, a perfume store in Owerri, Imo State"
+            src={businessInfo.mapEmbed}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-72 w-full rounded-[2rem] border border-amber-900/10"
+          />
+        </aside>
       </section>
 
       <section className="mt-12 grid gap-8 lg:grid-cols-[1fr_360px]">

@@ -13,6 +13,7 @@ const couponRoutes = require('./routes/coupons');
 const galleryRoutes = require('./routes/gallery');
 const analyticsRoutes = require('./routes/analytics');
 const testimonialRoutes = require('./routes/testimonials');
+const reviewRoutes = require('./routes/reviews');
 const promoRoutes = require('./routes/promos');
 const stockAlertRoutes = require('./routes/stockAlerts');
 const prisma = require('./lib/prisma');
@@ -69,6 +70,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/promos', promoRoutes);
 app.use('/api/stock-alerts', stockAlertRoutes);
 

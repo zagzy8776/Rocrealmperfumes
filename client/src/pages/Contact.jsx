@@ -1,7 +1,16 @@
+import { useEffect } from 'react';
 import { Mail, MapPin, MessageCircle, Music2, Phone, Sparkles } from 'lucide-react';
 import { businessInfo, whatsappNumber } from '../lib/api.js';
+import { setPageMeta } from '../lib/seo.js';
 
 export default function Contact() {
+  useEffect(() => {
+    setPageMeta({ 
+      title: 'Contact Roc Realm Perfumes Owerri | Order Original Fragrances', 
+      description: 'Contact our Owerri store: Prof Avenue Junction, by Spibat Road, Uratta. Call 08085100229, message WhatsApp or get directions on Google Maps.' 
+    });
+  }, []);
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
       <p className="text-sm uppercase tracking-[0.3em] text-amber-700">Contact</p>

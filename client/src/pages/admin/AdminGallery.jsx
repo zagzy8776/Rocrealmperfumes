@@ -10,8 +10,19 @@ export default function AdminGallery() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const load = () => api.get('/gallery/admin/all').then((res) => setImages(res.data.images)).catch((err) => setError(err.response?.data?.message || 'Unable to load gallery.'));
+  const load = async () => {
+    setInitialLoading(true);
+    try {
+      const res = await api.get('/gallery/admin/all');
+      setImages(res.data.images);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to load gallery.');
+    } finally {
+      setInitialLoading(false);
+    }
+  };
   useEffect(() => { load(); }, []);
 
   const chooseFile = (selectedFile) => {
@@ -80,6 +91,7 @@ export default function AdminGallery() {
 
       {message && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-green-50 p-4 text-green-700"><CheckCircle2 size={18} /> {message}</div>}
       {error && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-red-700"><AlertCircle size={18} /> {error}</div>}
+      {initialLoading && <div className="mt-6 rounded-2xl bg-amber-50 p-4 text-center text-amber-800">Loading gallery...</div>}
 
       <form onSubmit={submit} className="mt-8 grid gap-6 rounded-[2.5rem] bg-white/80 p-6 shadow-sm backdrop-blur-xl lg:grid-cols-[320px_1fr]">
         <label className="grid min-h-80 cursor-pointer place-items-center overflow-hidden rounded-[2rem] border-2 border-dashed border-amber-300 bg-amber-50/80 text-center transition hover:bg-amber-100">

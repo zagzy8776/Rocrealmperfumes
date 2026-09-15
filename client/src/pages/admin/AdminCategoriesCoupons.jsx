@@ -11,37 +11,51 @@ export default function AdminCategoriesCoupons() {
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
-    const [catRes, couponRes] = await Promise.all([api.get('/categories'), api.get('/coupons')]);
-    setCategories(catRes.data.categories);
-    setCoupons(couponRes.data.coupons);
+    setLoading(true);
+    try {
+      const [catRes, couponRes] = await Promise.all([api.get('/categories'), api.get('/coupons')]);
+      setCategories(catRes.data.categories);
+      setCoupons(couponRes.data.coupons);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to load settings.');
+    } finally {
+      setLoading(false);
+    }
   };
-  useEffect(() => { load().catch((err) => setError(err.response?.data?.message || 'Unable to load settings.')); }, []);
+  useEffect(() => { load(); }, []);
 
   const addCategory = async (e) => {
     e.preventDefault();
     setError(''); setMessage('');
+    setLoading(true);
     try {
       if (editingCategory) await api.put(`/categories/${editingCategory}`, category); else await api.post('/categories', category);
       setCategory({ name: '', description: '' });
       setEditingCategory(null);
       setMessage(editingCategory ? 'Category updated.' : 'Category added.');
-      load();
-    } catch (err) { setError(err.response?.data?.message || 'Could not add category.'); }
+      await load();
+    } catch (err) { setError(err.response?.data?.message || 'Could not add category.'); } finally {
+      setLoading(false);
+    }
   };
 
   const addCoupon = async (e) => {
     e.preventDefault();
     setError(''); setMessage('');
+    setLoading(true);
     try {
       const payload = { ...coupon, value: Number(coupon.value), expiresAt: coupon.expiresAt ? new Date(coupon.expiresAt).toISOString() : null };
       if (editingCoupon) await api.put(`/coupons/${editingCoupon}`, payload); else await api.post('/coupons', payload);
       setCoupon({ code: '', type: 'PERCENTAGE', value: '', isActive: true, expiresAt: '' });
       setEditingCoupon(null);
       setMessage(editingCoupon ? 'Coupon updated.' : 'Coupon added.');
-      load();
-    } catch (err) { setError(err.response?.data?.message || 'Could not add coupon.'); }
+      await load();
+    } catch (err) { setError(err.response?.data?.message || 'Could not add coupon.'); } finally {
+      setLoading(false);
+    }
   };
 
   const deleteCategory = async (id) => { if (confirm('Delete category?')) { await api.delete(`/categories/${id}`); setMessage('Category deleted.'); load(); } };
@@ -59,6 +73,7 @@ export default function AdminCategoriesCoupons() {
 
       {message && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-green-50 p-4 text-green-700"><CheckCircle2 size={18} /> {message}</div>}
       {error && <div className="mt-6 flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-red-700"><AlertCircle size={18} /> {error}</div>}
+      {loading && <div className="mt-6 rounded-2xl bg-amber-50 p-4 text-center text-amber-800">Loading...</div>}
 
       <div className="mt-8 grid gap-8 xl:grid-cols-2">
         <div>

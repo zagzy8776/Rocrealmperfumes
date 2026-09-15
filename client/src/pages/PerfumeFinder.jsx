@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MessageCircle, Sparkles } from 'lucide-react';
 import { whatsappNumber } from '../lib/api.js';
+import { setPageMeta } from '../lib/seo.js';
 
 const options = {
   gender: ['Female', 'Male', 'Unisex'],
@@ -11,6 +12,12 @@ const options = {
 };
 
 export default function PerfumeFinder() {
+  useEffect(() => {
+    setPageMeta({ 
+      title: 'Perfume Finder Quiz', 
+      description: 'Find your signature scent with Roc Realm Perfumes quiz. Answer questions about gender, budget, mood, occasion, and strength for personalized fragrance recommendations.' 
+    });
+  }, []);
   const [answers, setAnswers] = useState({ gender: '', budget: '', mood: '', occasion: '', strength: '' });
   const complete = Object.values(answers).every(Boolean);
   const recommendation = useMemo(() => complete ? `A ${answers.strength.toLowerCase()} ${answers.mood.toLowerCase()} ${answers.gender.toLowerCase()} scent for ${answers.occasion.toLowerCase()}, within ${answers.budget}.` : 'Answer the questions to get a scent direction.', [answers, complete]);
