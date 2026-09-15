@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "cd client && npm ci && cd ../server && npm ci",
+  "installCommand": "cd client && npm ci --include=dev --no-audit --no-fund && cd ../server && npm ci --include=dev --no-audit --no-fund",
   "buildCommand": "bash scripts/vercel-build.sh",
   "outputDirectory": "client/dist",
   "functions": {
