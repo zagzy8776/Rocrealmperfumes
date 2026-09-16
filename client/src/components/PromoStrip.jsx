@@ -3,14 +3,27 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 
 export default function PromoStrip() {
-  const [banners, setBanners] = useState([]);
-  useEffect(() => { api.get('/promos/active').then((res) => setBanners(res.data.banners || [])).catch(() => setBanners([])); }, []);
+  const [banners, setBanners] = useState(null);
+  useEffect(() => {
+    api
+      .get('/promos/active')
+      .then((res) => setBanners(res.data.banners || []))
+      .catch(() => setBanners([]));
+  }, []);
+  // Reserve strip height while loading so promo paint does not shift the sticky header (CLS).
+  if (banners === null) {
+    return <div className="min-h-[2.75rem] bg-stone-950 px-4 py-3" aria-hidden="true" />;
+  }
   if (!banners.length) return null;
   const banner = banners[0];
   return (
-    <div className="bg-stone-950 px-4 py-3 text-center text-sm text-white">
+    <div className="min-h-[2.75rem] bg-stone-950 px-4 py-3 text-center text-sm text-white">
       <strong className="text-amber-300">{banner.title}:</strong> {banner.message}{' '}
-      {banner.linkUrl && <Link to={banner.linkUrl} className="font-bold text-amber-200 underline">{banner.linkLabel || 'Learn more'}</Link>}
+      {banner.linkUrl && (
+        <Link to={banner.linkUrl} className="font-bold text-amber-200 underline">
+          {banner.linkLabel || 'Learn more'}
+        </Link>
+      )}
     </div>
   );
 }
