@@ -8,7 +8,7 @@ const apiUrl = resolveApiUrl();
 const distDir = new URL('../dist/', import.meta.url);
 const NL = String.fromCharCode(10);
 
-const escapeXml = (value) => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
+const escapeXml = (value) => String(value ?? '').replaceAll('&', '&').replaceAll('<', '<').replaceAll('>', '>').replaceAll('"', '"').replaceAll("'", ''');
 const today = new Date().toISOString().split('T')[0];
 const toDate = (value) => {
   const date = value ? new Date(value) : null;
@@ -62,5 +62,42 @@ const robots = ['User-agent: *', 'Allow: /', 'Disallow: /admin', 'Disallow: /car
 await mkdir(distDir, { recursive: true });
 await writeFile(new URL('sitemap.xml', distDir), lines.join(NL), 'utf8');
 await writeFile(new URL('robots.txt', distDir), robots, 'utf8');
+
+const llms = [
+  '# Roc Realm Perfumes',
+  '',
+  '> Original designer and Arabian perfumes, perfume oils, oud, body mists, and gift sets from Owerri, Imo State, Nigeria.',
+  '',
+  'Roc Realm Perfumes (Roc Realm Nigeria Limited) is a perfume store in Uratta, Owerri. Authentic designer and Arabic fragrances with delivery across the South East.',
+  '',
+  '## Primary pages',
+  '',
+  `- [Home](${siteUrl}/)`,
+  `- [Shop](${siteUrl}/shop)`,
+  `- [Gifts](${siteUrl}/gifts)`,
+  `- [Perfume Finder](${siteUrl}/perfume-finder)`,
+  `- [Blog](${siteUrl}/blog)`,
+  `- [FAQ](${siteUrl}/faq)`,
+  `- [Delivery](${siteUrl}/delivery)`,
+  `- [Contact](${siteUrl}/contact)`,
+  `- [About](${siteUrl}/about)`,
+  `- [Fragrance Glossary](${siteUrl}/fragrance-glossary)`,
+  '',
+  '## Service areas',
+  '',
+  `- [Owerri](${siteUrl}/locations/owerri)`,
+  `- [Port Harcourt](${siteUrl}/locations/port-harcourt)`,
+  `- [Onitsha](${siteUrl}/locations/onitsha)`,
+  `- [Anambra](${siteUrl}/locations/anambra)`,
+  `- [Enugu](${siteUrl}/locations/enugu)`,
+  '',
+  '## Optional',
+  '',
+  `- [Sitemap](${siteUrl}/sitemap.xml)`,
+  `- [Robots](${siteUrl}/robots.txt)`,
+  '',
+].join(NL);
+
+await writeFile(new URL('llms.txt', distDir), llms, 'utf8');
 
 console.log(`Sitemap written: ${entries.length} URLs (${products.length} products) for ${siteUrl}`);
