@@ -14,7 +14,7 @@ export const SERVICE_AREAS = [
     ],
     landmarks: ['Uratta', 'New Owerri', 'Ikenegbu', 'Douglas Road', 'Wetheral Road', 'MCC Road', 'World Bank', 'Orji', 'Amakohia', 'Egbu', 'Nekede', 'Ihiagwa', 'FUTO', 'Imo State University', 'Alvan Ikoku', 'Shoprite Owerri', 'Relief Market', 'Sam Mbakwe Airport'],
     delivery: 'Free store pickup in Uratta, Owerri delivery for 3,000 naira, and waybill and park dispatch to the rest of Imo State for 1,000 naira plus any remaining rider cost.',
-    keywords: ['perfume shop in Owerri', 'perfume store in Owerri', 'best perfume store in Owerri', 'original perfume Owerri', 'perfume delivery in Owerri', 'perfume vendor Owerri'],
+    keywords: ['perfume store in Owerri', 'best perfume shop in Owerri', 'where to buy original perfumes in Owerri', 'fragrance store Owerri', 'perfume delivery in Owerri', 'authentic perfumes Owerri', 'luxury perfume store Owerri', 'affordable perfume store Owerri'],
   },
   {
     slug: 'port-harcourt',
