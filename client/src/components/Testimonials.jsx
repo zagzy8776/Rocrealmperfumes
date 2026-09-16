@@ -46,7 +46,11 @@ export default function Testimonials() {
                   <span className="block text-xs font-normal text-stone-500">{item.location}</span>
                 ) : null}
               </span>
-              <span className="flex items-center gap-0.5" aria-label={`${item.rating} out of 5 stars`}>
+              <span
+                className="flex items-center gap-0.5"
+                role="img"
+                aria-label={`${item.rating} out of 5 stars`}
+              >
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
