@@ -8,7 +8,13 @@ const apiUrl = resolveApiUrl();
 const distDir = new URL('../dist/', import.meta.url);
 const NL = String.fromCharCode(10);
 
-const escapeXml = (value) => String(value ?? '').replaceAll('&', '&').replaceAll('<', '<').replaceAll('>', '>').replaceAll('"', '"').replaceAll("'", ''');
+const escapeXml = (value) =>
+  String(value ?? '')
+    .replaceAll('&', '&' + 'amp;')
+    .replaceAll('<', '&' + 'lt;')
+    .replaceAll('>', '&' + 'gt;')
+    .replaceAll('"', '&' + 'quot;')
+    .replaceAll("'", '&' + 'apos;');
 const today = new Date().toISOString().split('T')[0];
 const toDate = (value) => {
   const date = value ? new Date(value) : null;
