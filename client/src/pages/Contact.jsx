@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { Mail, MapPin, MessageCircle, Music2, Phone, Sparkles } from 'lucide-react';
 import { businessInfo, whatsappNumber } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
+import { HIGH_INTENT_LOCAL, metaKeywords } from '../lib/keywords.js';
 
 export default function Contact() {
   useEffect(() => {
-    setPageMeta({ 
-      title: 'Contact Roc Realm Perfumes Owerri | Order Original Fragrances', 
-      description: 'Contact our Owerri store: Prof Avenue Junction, by Spibat Road, Uratta. Call 08085100229, message WhatsApp or get directions on Google Maps.' 
+    setPageMeta({
+      title: 'Contact Perfume Store in Owerri | Roc Realm Perfumes',
+      description: 'Contact the best perfume shop in Owerri: Prof Avenue Junction, by Spibat Road, Uratta. Call 08085100229, WhatsApp, or visit for original designer and Arabian fragrances.',
+      keywords: metaKeywords(HIGH_INTENT_LOCAL),
     });
   }, []);
 
