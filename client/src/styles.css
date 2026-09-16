@@ -55,3 +55,14 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Reduce layout shift from images and late-loading sections */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.product-card-media,
+.product-card-media img {
+  aspect-ratio: 1 / 1;
+}
