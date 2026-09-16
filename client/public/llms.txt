@@ -1,0 +1,31 @@
+# Roc Realm Perfumes
+
+> Original designer and Arabian perfumes, perfume oils, oud, body mists, and gift sets from Owerri, Imo State, Nigeria. Delivery across Owerri, Port Harcourt, Onitsha, Anambra, and Enugu.
+
+Roc Realm Perfumes (Roc Realm Nigeria Limited) is a perfume store in Uratta, Owerri. We sell authentic designer and Arabic fragrances, long-lasting perfume oils, and gift sets. Customers can order online or via WhatsApp.
+
+## Primary pages
+
+- [Home](/): Best perfume store in Owerri — shop overview and trending scents
+- [Shop](/shop): Designer perfumes for men and women, Arabic and oud, perfume oils
+- [Gifts](/gifts): Birthday, anniversary, wedding and luxury perfume gift sets
+- [Perfume Finder](/perfume-finder): Quiz to match budget, mood and occasion
+- [Blog](/blog): Guides on authenticity, longevity, Nigerian weather and gifting
+- [FAQ](/faq): Delivery, payment, originality and longevity answers
+- [Delivery](/delivery): Owerri delivery fees and nationwide dispatch
+- [Contact](/contact): Store location in Uratta, phone and WhatsApp
+- [About](/about): About Roc Realm Nigeria Limited
+- [Fragrance Glossary](/fragrance-glossary): Notes, concentrations, scent families
+
+## Service areas
+
+- [Owerri](/locations/owerri)
+- [Port Harcourt](/locations/port-harcourt)
+- [Onitsha](/locations/onitsha)
+- [Anambra](/locations/anambra)
+- [Enugu](/locations/enugu)
+
+## Optional
+
+- [Sitemap](/sitemap.xml)
+- [Robots](/robots.txt)
