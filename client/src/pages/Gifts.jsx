@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api.js';
 import { setPageMeta } from '../lib/seo.js';
+import { OCCASION_KEYWORDS, metaKeywords } from '../lib/keywords.js';
 import ProductCard from '../components/ProductCard.jsx';
 
 const sections = [
@@ -13,9 +14,10 @@ const sections = [
 export default function Gifts() {
   const [products, setProducts] = useState([]);
   useEffect(() => { 
-    setPageMeta({ 
-      title: 'Perfume Gifts', 
-      description: 'Perfume gift sets, birthday and anniversary fragrances for her and him at Roc Realm Perfumes, Owerri, with gift-ready packaging.' 
+    setPageMeta({
+      title: 'Perfume Gifts in Owerri | Birthday, Anniversary & Wedding',
+      description: 'Birthday perfume gifts, anniversary and Valentine\'s Day fragrances, wedding scent gifts and luxury gift boxes in Owerri. Gift-ready packaging from Roc Realm Perfumes.',
+      keywords: metaKeywords(OCCASION_KEYWORDS),
     });
     api.get('/products').then((res) => setProducts(res.data.products)).catch(() => setProducts([])); 
   }, []);
