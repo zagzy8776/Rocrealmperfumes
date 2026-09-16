@@ -63,13 +63,14 @@ export default function ProductReviews({ productId }) {
           <div className="flex items-center gap-4">
             <div className="text-5xl font-bold text-stone-950">{averageRating}</div>
             <div>
-              <div className="flex text-amber-500">
+              <div className="flex text-amber-500" role="img" aria-label={`${averageRating} out of 5 stars`}>
                 {[1, 2, 3, 4, 5].map(star => (
                   <Star
                     key={star}
                     size={20}
                     fill={star <= Math.round(averageRating) ? 'currentColor' : 'none'}
                     className={star <= Math.round(averageRating) ? 'text-amber-500' : 'text-stone-300'}
+                    aria-hidden="true"
                   />
                 ))}
               </div>
@@ -124,11 +125,14 @@ export default function ProductReviews({ productId }) {
                       type="button"
                       onClick={() => setForm({ ...form, rating: star })}
                       className="p-2 transition hover:scale-110"
+                      aria-label={`${star} out of 5 stars`}
+                      aria-pressed={star <= form.rating}
                     >
                       <Star
                         size={28}
                         fill={star <= form.rating ? 'currentColor' : 'none'}
                         className={star <= form.rating ? 'text-amber-500' : 'text-stone-300'}
+                        aria-hidden="true"
                       />
                     </button>
                   ))}
@@ -174,13 +178,14 @@ export default function ProductReviews({ productId }) {
                 <div>
                   <div className="flex items-center gap-2">
                     <strong className="font-semibold">{review.name}</strong>
-                    <div className="flex text-amber-500">
+                    <div className="flex text-amber-500" role="img" aria-label={`${review.rating} out of 5 stars`}>
                       {[1, 2, 3, 4, 5].map(star => (
                         <Star
                           key={star}
                           size={14}
                           fill={star <= review.rating ? 'currentColor' : 'none'}
                           className={star <= review.rating ? 'text-amber-500' : 'text-stone-300'}
+                          aria-hidden="true"
                         />
                       ))}
                     </div>
