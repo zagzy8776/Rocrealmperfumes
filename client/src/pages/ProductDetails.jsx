@@ -41,10 +41,13 @@ export default function ProductDetails() {
         const productData = productRes.data.product;
         if (!productData) {
           setProduct(null);
+          setLoading(false);
           return;
         }
+        // Show the product immediately — do not wait on reviews/related.
         setProduct(productData);
         setActiveImage(productData.images?.[0] || '');
+        setLoading(false);
         setPageMeta({
           title: `${productData.name} | Original Perfume Owerri`,
           description: `${productData.name} - Original designer fragrance from Roc Realm Perfumes, #1 perfume store in Owerri, Imo State. ${productData.description || 'Shop trending Arabian and designer perfumes.'} Delivery to Port Harcourt, Onitsha, Anambra, Enugu.`,
@@ -72,18 +75,17 @@ export default function ProductDetails() {
       } catch (err) {
         if (cancelled) return;
         setProduct(null);
-        // Surface rate-limit / network failures clearly in the empty state below
         if (err.response?.status === 429) {
           setAlertMessage('Too many requests. Please wait a moment and refresh the page.');
         }
-      } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
+    // Only re-fetch when the URL slug changes. addToRecentlyViewed is stable via useCallback.
   }, [slug, addToRecentlyViewed]);
 
   if (loading) return <main className="mx-auto max-w-7xl px-4 py-20 text-center">Loading product...</main>;

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const RecentlyViewedContext = createContext();
 
@@ -19,7 +19,7 @@ export const RecentlyViewedProvider = ({ children }) => {
     }
   }, []);
 
-  const addToRecentlyViewed = (product) => {
+  const addToRecentlyViewed = useCallback((product) => {
     if (!product || !product.id) return;
 
     setRecentlyViewed((prev) => {
@@ -28,12 +28,12 @@ export const RecentlyViewedProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const clearRecentlyViewed = () => {
+  const clearRecentlyViewed = useCallback(() => {
     setRecentlyViewed([]);
     localStorage.removeItem(STORAGE_KEY);
-  };
+  }, []);
 
   return (
     <RecentlyViewedContext.Provider value={{ recentlyViewed, addToRecentlyViewed, clearRecentlyViewed }}>
