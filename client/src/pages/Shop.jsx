@@ -18,6 +18,7 @@ export default function Shop() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasMore: false });
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
 
@@ -56,21 +57,34 @@ export default function Shop() {
     params.set('limit', String(PRODUCTS_PER_BATCH));
 
     setLoading(true);
+    setLoadError('');
     try {
       const res = await api.get(`/products?${params.toString()}`);
       setProducts(res.data.products);
       setPagination(res.data.pagination || { total: res.data.products.length, totalPages: 1, hasMore: false });
       setPage(targetPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
+    } catch (err) {
       setProducts([]);
       setPagination({ total: 0, totalPages: 1, hasMore: false });
+      if (err.response?.status === 429) {
+        setLoadError('Too many requests. Please wait a moment and try again.');
+      } else {
+        setLoadError('Could not load products. Please refresh the page.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { fetchProducts(1); }, [category, search, sort, availability, selectedCategories, priceRange]);
+
+  const pageNumbers = useMemo(() => {
+    const totalPages = Math.max(1, pagination.totalPages || 1);
+    const start = Math.max(1, page - 2);
+    const end = Math.min(totalPages, start + 4);
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [page, pagination.totalPages]);
 
   const toggleCategory = (slug) => {
     setSelectedCategories(prev => {
@@ -202,7 +216,20 @@ export default function Shop() {
           <p className="w-full text-center text-sm text-stone-500">Page {page} of {pagination.totalPages} · {pagination.total} products</p>
         </div>
       )}
-      {!products.length && !loading && <p className="py-20 text-center text-stone-500">No products found.</p>}
+      {!products.length && !loading && (
+        <div className="py-20 text-center">
+          <p className="text-stone-500">{loadError || 'No products found.'}</p>
+          {loadError && (
+            <button
+              type="button"
+              onClick={() => fetchProducts(1)}
+              className="mt-4 rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-white"
+            >
+              Retry
+            </button>
+          )}
+        </div>
+      )}
     </main>
   );
 }

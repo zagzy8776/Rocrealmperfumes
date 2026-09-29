@@ -36,7 +36,37 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+
+// Public catalogue traffic (home, shop, product pages) is high on Vercel serverless.
+// In-memory counters are per-instance and shared carrier IPs burn budget fast, so
+// the public ceiling is intentionally high. Tight limits stay on write/auth routes.
+const isVercel = Boolean(process.env.VERCEL);
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: isVercel ? 5000 : 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again in a few minutes.' },
+  skip: (req) => {
+    if (req.method === 'OPTIONS') return true;
+    const p = req.path || '';
+    return p === '/' || p === '/health' || p === '/api/health';
+  },
+});
+
+// Write / auth routes stay tighter to reduce abuse.
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later.' },
+});
+
+app.use(publicLimiter);
+app.use('/api/auth', writeLimiter);
+app.use('/api/orders', writeLimiter);
+app.use('/api/stock-alerts', writeLimiter);
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/', (req, res) => res.json({ name: 'Roc Realm Perfume API', status: 'healthy' }));

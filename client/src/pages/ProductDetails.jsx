@@ -27,30 +27,86 @@ export default function ProductDetails() {
   const { addToRecentlyViewed, recentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    let loaded = null;
-    api.get(`/products/${slug}`).then((res) => {
-      const productData = res.data.product;
-      loaded = productData;
-      setProduct(productData);
-      setActiveImage(productData.images?.[0] || '');
-      setPageMeta({ 
-        title: `${productData.name} | Original Perfume Owerri`,
-        description: `${productData.name} - Original designer fragrance from Roc Realm Perfumes, #1 perfume store in Owerri, Imo State. ${productData.description || 'Shop trending Arabian and designer perfumes.'} Delivery to Port Harcourt, Onitsha, Anambra, Enugu.`,
-        image: productData.images?.[0] 
-      });
-      addToRecentlyViewed(productData);
-      return api.get(`/reviews/product/${productData.id}`).catch(() => ({ data: { reviews: [] } }));
-    }).then((res) => {
-      const reviewsData = res.data.reviews || [];
-      setReviews(reviewsData);
-      setProductStructuredData(loaded, reviewsData);
-      return api.get(`/products?category=${product.category?.slug || ''}`);
-    }).then((res) => setRelated(res.data.products.filter((item) => item.slug !== slug).slice(0, 5))).catch(() => {}).finally(() => setLoading(false));
+    setProduct(null);
+    setRelated([]);
+    setReviews([]);
+    setAlertMessage('');
+
+    (async () => {
+      try {
+        const productRes = await api.get(`/products/${slug}`);
+        if (cancelled) return;
+        const productData = productRes.data.product;
+        if (!productData) {
+          setProduct(null);
+          return;
+        }
+        setProduct(productData);
+        setActiveImage(productData.images?.[0] || '');
+        setPageMeta({
+          title: `${productData.name} | Original Perfume Owerri`,
+          description: `${productData.name} - Original designer fragrance from Roc Realm Perfumes, #1 perfume store in Owerri, Imo State. ${productData.description || 'Shop trending Arabian and designer perfumes.'} Delivery to Port Harcourt, Onitsha, Anambra, Enugu.`,
+          image: productData.images?.[0],
+        });
+        addToRecentlyViewed(productData);
+
+        const relatedQuery = productData.category?.slug
+          ? `/products?category=${encodeURIComponent(productData.category.slug)}&limit=6`
+          : '/products?limit=6';
+        const [reviewsRes, relatedRes] = await Promise.all([
+          api.get(`/reviews/product/${productData.id}`).catch(() => ({ data: { reviews: [] } })),
+          api.get(relatedQuery).catch(() => ({ data: { products: [] } })),
+        ]);
+        if (cancelled) return;
+
+        const reviewsData = reviewsRes.data.reviews || [];
+        setReviews(reviewsData);
+        setProductStructuredData(productData, reviewsData);
+        setRelated(
+          (relatedRes.data.products || [])
+            .filter((item) => item.slug !== slug)
+            .slice(0, 5),
+        );
+      } catch (err) {
+        if (cancelled) return;
+        setProduct(null);
+        // Surface rate-limit / network failures clearly in the empty state below
+        if (err.response?.status === 429) {
+          setAlertMessage('Too many requests. Please wait a moment and refresh the page.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug, addToRecentlyViewed]);
 
   if (loading) return <main className="mx-auto max-w-7xl px-4 py-20 text-center">Loading product...</main>;
-  if (!product) return <main className="mx-auto max-w-7xl px-4 py-20 text-center"><h1 className="font-display text-4xl">Product not found</h1><Link to="/shop" className="mt-5 inline-block rounded-full bg-stone-950 px-6 py-3 text-white">Back to shop</Link></main>;
+  if (!product) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-20 text-center">
+        <h1 className="font-display text-4xl">{alertMessage ? 'Please try again' : 'Product not found'}</h1>
+        {alertMessage && <p className="mt-4 text-stone-600">{alertMessage}</p>}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {alertMessage && (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-full bg-amber-600 px-6 py-3 font-semibold text-white hover:bg-amber-700"
+            >
+              Retry
+            </button>
+          )}
+          <Link to="/shop" className="inline-block rounded-full bg-stone-950 px-6 py-3 text-white">Back to shop</Link>
+        </div>
+      </main>
+    );
+  }
 
   const price = product.salePrice || product.price;
   const message = encodeURIComponent(`Hello Roc Realm Perfume, I want to order ${product.name}. Quantity: ${qty}. Price: ${formatNaira(price * qty)}.`);

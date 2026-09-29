@@ -18,6 +18,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasMore: false });
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     setPageMeta({
@@ -33,6 +34,7 @@ export default function Home() {
 
   const fetchProducts = async (targetPage = 1, shouldScroll = true) => {
     setLoading(true);
+    setLoadError('');
     try {
       const res = await api.get(`/products?page=${targetPage}&limit=${HOME_PRODUCTS_PER_BATCH}`);
       setProducts(res.data.products);
@@ -40,9 +42,14 @@ export default function Home() {
       setPagination(res.data.pagination || { total: res.data.products.length, totalPages: 1, hasMore: false });
       setPage(targetPage);
       if (shouldScroll) document.getElementById('home-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch {
+    } catch (err) {
       setProducts([]);
       setPagination({ total: 0, totalPages: 1, hasMore: false });
+      setLoadError(
+        err.response?.status === 429
+          ? 'Too many requests. Please wait a moment and try again.'
+          : 'Could not load products. Please refresh the page.',
+      );
     } finally {
       setLoading(false);
     }
@@ -108,7 +115,20 @@ export default function Home() {
             <p className="w-full text-center text-sm text-stone-500">Page {page} of {pagination.totalPages} · {pagination.total} products</p>
           </div>
         )}
-        {!products.length && !loading && <p className="rounded-[2rem] bg-white p-10 text-center text-stone-500">No products yet. Add products from the admin panel.</p>}
+        {!products.length && !loading && (
+          <div className="rounded-[2rem] bg-white p-10 text-center text-stone-500">
+            <p>{loadError || 'No products yet. Add products from the admin panel.'}</p>
+            {loadError && (
+              <button
+                type="button"
+                onClick={() => fetchProducts(1, false)}
+                className="mt-4 rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-white"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="bg-white py-14">
