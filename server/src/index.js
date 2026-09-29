@@ -21,9 +21,37 @@ const { requireAdmin } = require('./middleware/auth');
 
 const app = express();
 const port = process.env.PORT || 5000;
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((origin) => origin.trim()).filter(Boolean)
-  : ['http://localhost:5173'];
+
+// Expand CLIENT_URL entries with www / apex variants so custom domains never break CORS.
+const expandOrigin = (value) => {
+  const origin = String(value || '').trim().replace(/\/+$/, '');
+  if (!origin) return [];
+  const variants = new Set([origin]);
+  try {
+    const url = new URL(origin);
+    if (url.hostname.startsWith('www.')) {
+      variants.add(`${url.protocol}//${url.hostname.slice(4)}`);
+    } else {
+      variants.add(`${url.protocol}//www.${url.hostname}`);
+    }
+  } catch {
+    // ignore invalid origin strings
+  }
+  return [...variants];
+};
+
+const allowedOrigins = [
+  ...new Set(
+    (process.env.CLIENT_URL || 'http://localhost:5173')
+      .split(',')
+      .flatMap(expandOrigin)
+      .concat([
+        'https://rocrealmperfumes.vercel.app',
+        'https://www.rocrealmperfume.com.ng',
+        'https://rocrealmperfume.com.ng',
+      ]),
+  ),
+];
 
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
@@ -32,6 +60,10 @@ app.use(compression());
 app.use(cors({
   origin(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    // Same-site Vercel previews
+    if (/^https:\/\/rocrealmperfumes[a-z0-9-]*\.vercel\.app$/i.test(origin)) {
+      return callback(null, true);
+    }
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
